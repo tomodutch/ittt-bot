@@ -1,0 +1,47 @@
+{
+    "location": {
+        "locationName": "London",
+        "locationRegion": "City of London, Greater London",
+        "locationCountry": "United Kingdom",
+        "latitude": 51.5171,
+        "longitude": -0.1062,
+        "timeZoneId": "Europe/London",
+        "localTimeEpoch": 1750296345,
+        "localTime": "2025-06-19 02:25"
+    },
+    "current": {
+        "lastUpdatedEpoch": 1750295700,
+        "lastUpdated": "2025-06-19 02:15",
+        "temperatureCelsius": 16.2,
+        "temperatureFahrenheit": 61.2,
+        "isDay": 0,
+        "weatherCondition": {
+            "text": "Clear",
+            "iconUrl": "//cdn.weatherapi.com/weather/64x64/night/113.png",
+            "conditionCode": 1000
+        },
+        "windMph": 2.2,
+        "windKph": 3.6,
+        "windDegree": 283,
+        "windDirection": "WNW",
+        "pressureMillibar": 1024,
+        "pressureInches": 30.24,
+        "precipitationMillimeters": 0,
+        "precipitationInches": 0,
+        "humidityPercent": 82,
+        "cloudCoveragePercent": 0,
+        "feelsLikeCelsius": 16.2,
+        "feelsLikeFahrenheit": 61.2,
+        "windChillCelsius": 18.4,
+        "windChillFahrenheit": 65.1,
+        "heatIndexCelsius": 18.4,
+        "heatIndexFahrenheit": 65.1,
+        "dewPointCelsius": 13.2,
+        "dewPointFahrenheit": 55.8,
+        "visibilityKilometers": 10,
+        "visibilityMiles": 6,
+        "uvIndex": 0,
+        "gustMph": 6.7,
+        "gustKph": 10.8
+    }
+}

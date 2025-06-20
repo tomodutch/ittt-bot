@@ -1,0 +1,30 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Thu, 19 Jun 2025 01:29:50 GMT",
+        "Content-Type": "application\/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Vary": "Accept-Encoding",
+        "Server": "BunnyCDN-JP1-1185",
+        "CDN-PullZone": "93447",
+        "CDN-Uid": "8fa3a04a-75d9-4707-8056-b7b33c8ac7fe",
+        "CDN-RequestCountryCode": "JP",
+        "Age": "0",
+        "Cache-Control": "public, max-age=180",
+        "Via": "1.1 varnish (Varnish\/7.1)",
+        "x-weatherapi-qpm-left": "4999999",
+        "x-varnish": "483203339",
+        "CDN-ProxyVer": "1.30",
+        "CDN-RequestPullSuccess": "True",
+        "CDN-RequestPullCode": "200",
+        "CDN-CachedAt": "06\/19\/2025 01:29:50",
+        "CDN-EdgeStorageId": "1188",
+        "CDN-RequestId": "77ef896e172e6323a90365702c9912ef",
+        "CDN-Cache": "MISS",
+        "CDN-Status": "200",
+        "CDN-RequestTime": "0"
+    },
+    "data": "{\"location\":{\"name\":\"London\",\"region\":\"City of London, Greater London\",\"country\":\"United Kingdom\",\"lat\":51.5171,\"lon\":-0.1062,\"tz_id\":\"Europe\/London\",\"localtime_epoch\":1750296345,\"localtime\":\"2025-06-19 02:25\"},\"current\":{\"last_updated_epoch\":1750295700,\"last_updated\":\"2025-06-19 02:15\",\"temp_c\":16.2,\"temp_f\":61.2,\"is_day\":0,\"condition\":{\"text\":\"Clear\",\"icon\":\"\/\/cdn.weatherapi.com\/weather\/64x64\/night\/113.png\",\"code\":1000},\"wind_mph\":2.2,\"wind_kph\":3.6,\"wind_degree\":283,\"wind_dir\":\"WNW\",\"pressure_mb\":1024.0,\"pressure_in\":30.24,\"precip_mm\":0.0,\"precip_in\":0.0,\"humidity\":82,\"cloud\":0,\"feelslike_c\":16.2,\"feelslike_f\":61.2,\"windchill_c\":18.4,\"windchill_f\":65.1,\"heatindex_c\":18.4,\"heatindex_f\":65.1,\"dewpoint_c\":13.2,\"dewpoint_f\":55.8,\"vis_km\":10.0,\"vis_miles\":6.0,\"uv\":0.0,\"gust_mph\":6.7,\"gust_kph\":10.8}}",
+    "context": []
+}
