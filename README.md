@@ -58,6 +58,7 @@ classDiagram
         datetime? oneTimeAt       // for 'once'
         time? runTime             // for 'daily' and 'weekly'
         smallint[]? daysOfWeek    // for 'weekly' (1 = Mon, 7 = Sun)
+        string timezone
         datetime createdAt
         datetime updatedAt
         datetime deletedAt
@@ -66,12 +67,12 @@ classDiagram
     class TriggerExecution {
         UUID id
         UUID triggerId
+        UUID scheduleId
         string? originType   // 'user', 'system', 'api', 'webhook'
         string? originId     // UUID or identifier
         int statusCode
         int runReasonCode // 0 = scheduled, 1 = manual, 2 = webhook
         jsonb context
-        datetime startedAt
         datetime finishedAt
         datetime createdAt
         datetime updatedAt
