@@ -17,7 +17,7 @@ class DueScheduleFinder
         $onceSchedules = Schedule::where("type_code", ScheduleType::Once)
             ->where('one_time_at', '<=', $nowUtc)
             ->whereDoesntHave('triggerExecutions', function ($query) {
-                $query->whereNotNull('schedule_id');
+                $query->whereNotNull('id');
             })
             ->get();
 
@@ -26,7 +26,7 @@ class DueScheduleFinder
         ]);
 
         $dailySchedules = Schedule::where('type_code', ScheduleType::Daily)
-            ->whereDoesntHave('triggerExecutions', fn($q) => $q->whereNotNull('schedule_id'))
+            ->whereDoesntHave('triggerExecutions', fn($q) => $q->whereNotNull('id'))
             ->get()
             ->filter(function ($schedule) use ($nowUtc) {
                 $localNow = $nowUtc->copy()->setTimezone($schedule->timezone);
@@ -38,11 +38,11 @@ class DueScheduleFinder
         ]);
 
         $weeklySchedules = Schedule::where('type_code', ScheduleType::Weekly)
-            ->whereDoesntHave('triggerExecutions', fn($q) => $q->whereNotNull('schedule_id'))
+            ->whereDoesntHave('triggerExecutions', fn($q) => $q->whereNotNull('id'))
             ->get()
             ->filter(function ($schedule) use ($nowUtc) {
                 $localNow = $nowUtc->copy()->setTimezone($schedule->timezone);
-                $weekday = $localNow->dayOfWeek === 0 ? 7 : $localNow->dayOfWeek; // 1=Mon ... 7=Sun
+                $weekday = $localNow->dayOfWeek === 0 ? 7 : $localNow->dayOfWeek;
                 return in_array($weekday, $schedule->days_of_the_week ?? []) &&
                     $schedule->time <= $localNow->format('H:i:s');
             });

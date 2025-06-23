@@ -22,7 +22,6 @@ class TriggerExecutionFactory extends Factory
     {
         return [
             "trigger_id" => Trigger::factory(),
-            "schedule_id" => Schedule::factory(),
             "origin_type" => "SYSTEM",
             "origin_id" => $this->faker->uuid(),
             "status_code" => ExecutionStatus::Idle,

@@ -36,9 +36,7 @@ class DueScheduleFinderTest extends TestCase
             "one_time_at" => Carbon::getTestNow()->subSeconds(20)
         ]);
 
-        $schedule->triggerExecutions()->save(TriggerExecution::factory()->create([
-            "schedule_id" => $schedule->id,
-        ]));
+        $schedule->triggerExecutions()->save(TriggerExecution::factory()->create());
 
         $result = $this->findDueSchedules();
         $this->assertEmpty($result, "Expected to find 0 schedules");

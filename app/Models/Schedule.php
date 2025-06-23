@@ -37,8 +37,8 @@ class Schedule extends Model
         return $this->belongsTo(Trigger::class);
     }
 
-    public function triggerExecutions(): HasMany
+    public function triggerExecutions()
     {
-        return $this->hasMany(TriggerExecution::class);
+        return $this->belongsToMany(TriggerExecution::class, 'schedule_trigger_execution');
     }
 }

@@ -18,7 +18,6 @@ class TriggerExecution extends Model
     protected $fillable = [
         "id",
         "trigger_id",
-        "schedule_id",
         "origin_type",
         "origin_id",
         "status_code",
@@ -36,5 +35,10 @@ class TriggerExecution extends Model
     public function trigger()
     {
         return $this->belongsTo(Trigger::class);
+    }
+
+    public function schedules()
+    {
+        return $this->belongsToMany(Schedule::class, 'schedule_trigger_execution');
     }
 }
