@@ -14,8 +14,8 @@ class DueScheduleFinderTest extends TestCase
 
     public function test_empty()
     {
-        $service = new DueScheduleFinder();
-        $this->assertEmpty($service->find(), "should have no results");
+        $result = $this->findDueSchedules();
+        $this->assertEmpty($result, "should have no results");
     }
 
     public function test_with_one_result()
@@ -25,8 +25,7 @@ class DueScheduleFinderTest extends TestCase
             "one_time_at" => Carbon::getTestNow()->subSeconds(20)
         ]);
 
-        $service = new DueScheduleFinder();
-        $result = $service->find();
+        $result = $this->findDueSchedules();
         $this->assertCount(1, $result, "Expected to find only 1 due schedule");
     }
 
@@ -41,8 +40,7 @@ class DueScheduleFinderTest extends TestCase
             "schedule_id" => $schedule->id,
         ]));
 
-        $service = new DueScheduleFinder();
-        $result = $service->find();
+        $result = $this->findDueSchedules();
         $this->assertEmpty($result, "Expected to find 0 schedules");
     }
 
@@ -54,8 +52,7 @@ class DueScheduleFinderTest extends TestCase
             'time' => Carbon::getTestNow()->format('H:i:s'),
         ]);
 
-        $service = new DueScheduleFinder();
-        $result = $service->find();
+        $result = $this->findDueSchedules();
         $this->assertCount(1, $result, "Expected to find only 1 due schedule");
     }
 
@@ -68,8 +65,7 @@ class DueScheduleFinderTest extends TestCase
             'time' => Carbon::getTestNow()->format('H:i:s'),
         ]);
 
-        $service = new DueScheduleFinder();
-        $result = $service->find();
+        $result = $this->findDueSchedules();
         $this->assertEmpty($result, "Expected to find no due schedule");
     }
 
@@ -82,8 +78,7 @@ class DueScheduleFinderTest extends TestCase
             'time' => Carbon::getTestNow()->format('H:i:s'),
         ]);
 
-        $service = new DueScheduleFinder();
-        $result = $service->find();
+        $result = $this->findDueSchedules();
         $this->assertCount(1, $result, "Expected to find 1 due schedule");
     }
 
@@ -91,5 +86,11 @@ class DueScheduleFinderTest extends TestCase
     {
         parent::tearDown();
         Carbon::setTestNowAndTimezone();
+    }
+
+    private function findDueSchedules()
+    {
+        $service = new DueScheduleFinder();
+        return $service->find();
     }
 }
