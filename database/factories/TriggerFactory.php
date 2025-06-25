@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ExecutionStatus;
 use App\Enums\ExecutionType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
@@ -22,7 +23,7 @@ class TriggerFactory extends Factory
             "user_id" => User::factory(),
             "name" => $this->faker->name(),
             "description" => $this->faker->realTextBetween(10, 150),
-            "execution_type" => ExecutionType::Schedule
+            "execution_type" => ExecutionType::Schedule,
         ];
     }
 

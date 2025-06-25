@@ -27,12 +27,18 @@ class Trigger extends Model
         "execution_type" => ExecutionType::class
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    public function steps()
+    {
+        return $this->hasMany(Step::class);
     }
 }

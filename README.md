@@ -44,7 +44,7 @@ classDiagram
         UUID id
         string name
         string? description
-        int executionType        // 0 = schedule, 1 = webhook
+        int executionType
         string timezone
         datetime createdAt
         datetime updatedAt
@@ -55,9 +55,9 @@ classDiagram
         UUID id
         UUID triggerId
         int typeCode
-        datetime? oneTimeAt       // for 'once'
-        time? runTime             // for 'daily' and 'weekly'
-        smallint[]? daysOfWeek    // for 'weekly' (1 = Mon, 7 = Sun)
+        datetime? oneTimeAt
+        time? runTime
+        smallint[]? daysOfWeek
         string timezone
         datetime createdAt
         datetime updatedAt
@@ -68,10 +68,10 @@ classDiagram
         UUID id
         UUID triggerId
         UUID scheduleId
-        string? originType   // 'user', 'system', 'api', 'webhook'
-        string? originId     // UUID or identifier
+        string? originType
+        string? originId
         int statusCode
-        int runReasonCode // 0 = scheduled, 1 = manual, 2 = webhook
+        int runReasonCode
         jsonb context
         datetime finishedAt
         datetime createdAt
@@ -84,8 +84,7 @@ classDiagram
         UUID triggerId
         string? description
         int order
-        int typeCode // 0 = conditional, 1 = action
-        jsonb? expressionTree
+        jsonb? params
         string? actionName
         jsonb? actionParams
         datetime createdAt
@@ -97,22 +96,101 @@ classDiagram
         UUID id
         UUID triggerExecutionId
         UUID stepId
-        int statusCode
-        jsonb input
-        jsonb output
-        string? errorMessage
-        datetime startedAt
-        datetime finishedAt
+        string level
+        string message
+        jsonb details
         datetime createdAt
         datetime updatedAt
         datetime deletedAt
     }
+
+    class StepExecutionContext {
+        +getVariable(string key): mixed
+        +merge(array newVariables): StepExecutionContext
+    }
+
+    class StepResultBuilder {
+        +setVariable(string key, mixed value): self
+        +setDirective(FlowDirective): self
+        +build(): StepResult
+        +log(level, msg, ctx): void
+    }
+
+    class StepResult {
+        +getVariables(): array
+        +getDirective(): FlowDirective
+        +getLogs(): array
+    }
+
+    class TriggerExecutionProcessor {
+        +process(triggerExecution: TriggerExecution): void
+    }
+
+    class StepProcessor {
+        +process(step: Step, context: StepExecutionContext): StepResult
+    }
+
+    class StepHandlerResolver {
+        +resolve(step: Step): StepHandlerContract
+    }
+
+    class StepHandlerContract {
+        <<interface>>
+        +process(context: StepExecutionContext, builder: StepResultBuilder): void
+    }
+
+    class LoggerInterface {
+        <<interface>>
+        +emergency(msg, ctx): void
+        +alert(msg, ctx): void
+        +critical(msg, ctx): void
+        +error(msg, ctx): void
+        +warning(msg, ctx): void
+        +notice(msg, ctx): void
+        +info(msg, ctx): void
+        +debug(msg, ctx): void
+        +log(level, msg, ctx): void
+    }
+
+    %% FlowDirective hierarchy
+    class FlowDirective {
+        <<abstract>>
+    }
+
+    class ContinueDirective
+    class AbortDirective
+    class RetryDirective
+    class SkipDirective
+    class GotoStepDirective {
+        string stepId
+    }
+
+    FlowDirective <|-- ContinueDirective
+    FlowDirective <|-- AbortDirective
+    FlowDirective <|-- RetryDirective
+    FlowDirective <|-- SkipDirective
+    FlowDirective <|-- GotoStepDirective
 
     Trigger "1" --> "many" Schedule : has
     Trigger "1" --> "many" Step : has
     Trigger "1" --> "many" TriggerExecution : runs
     TriggerExecution "1" --> "many" StepExecutionLog : logs
     Step "1" --> "many" StepExecutionLog : has logs
+
+    TriggerExecutionProcessor --> TriggerExecution : processes
+    TriggerExecutionProcessor --> StepProcessor : uses
+    StepProcessor --> StepHandlerResolver : uses
+    StepProcessor --> StepExecutionContext : creates
+    StepProcessor --> StepResultBuilder : creates
+    StepProcessor --> StepResult : receives
+
+    StepProcessor --> Step : accesses via TriggerExecution
+
+    StepHandlerResolver ..|> StepHandlerContract : returns implementation of
+    StepHandlerContract --> StepExecutionContext : reads
+    StepHandlerContract --> StepResultBuilder : writes
+    StepResultBuilder ..|> LoggerInterface : implements
+    StepResult --> StepExecutionLog : contains
 ```
 
 ## 🛠️ How to Use

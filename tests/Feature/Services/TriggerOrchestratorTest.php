@@ -10,7 +10,7 @@ use App\Models\TriggerExecution;
 use App\Services\TriggerOrchestrator;
 use Tests\TestCase;
 
-class TriggerProcessorTest extends TestCase
+class TriggerOrchestratorTest extends TestCase
 {
     use RefreshDatabase;
     use WithFaker;

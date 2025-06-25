@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\ExecutionStatus;
+use App\Enums\ExecutionType;
 use App\Enums\RunReason;
 use App\Models\Schedule;
 use App\Models\Trigger;
@@ -28,5 +29,11 @@ class TriggerExecutionFactory extends Factory
             "run_reason_code" => RunReason::Scheduled,
             "context" => []
         ];
+    }
+
+    public function idle(): TriggerExecutionFactory   {
+        return $this->state(fn() => [
+            "status_code" => ExecutionStatus::Idle
+        ]);
     }
 }
