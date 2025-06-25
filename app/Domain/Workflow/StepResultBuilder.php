@@ -4,6 +4,7 @@ namespace App\Domain\Workflow;
 
 use App\Domain\Workflow\Directive\ContinueDirective;
 use App\Domain\Workflow\Directive\FlowDirective;
+use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -15,7 +16,7 @@ final class StepResultBuilder implements LoggerInterface
 
     public function setVariable(string $key, mixed $value): self
     {
-        $this->variables[$key] = $value;
+        Arr::set($this->variables, $key, $value);
         return $this;
     }
 

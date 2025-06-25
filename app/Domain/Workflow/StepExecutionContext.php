@@ -2,6 +2,8 @@
 
 namespace App\Domain\Workflow;
 
+use Illuminate\Support\Arr;
+
 final class StepExecutionContext
 {
     public function __construct(private array $variables, private array $params = [])
@@ -10,11 +12,12 @@ final class StepExecutionContext
 
     public function getVariable(string $key)
     {
-        if ($this->hasVariable($key)) {
-            return $this->variables[$key];
-        }
+        return Arr::get($this->variables, $key, null);
+    }
 
-        return null;
+    public function getVariables()
+    {
+        return $this->variables;
     }
 
     public function withParams(array $params)
@@ -29,11 +32,12 @@ final class StepExecutionContext
 
     public function hasVariable(string $key)
     {
-        return array_key_exists($key, $this->variables);
+        return Arr::has($this->variables, $key);
     }
 
-    public function merge(array $variables)
+    public function merge(array $newVariables): self
     {
-        return new self(array_merge($this->variables, $variables));
+        $merged = array_replace_recursive($this->variables, $newVariables);
+        return new self($merged, $this->params);
     }
 }

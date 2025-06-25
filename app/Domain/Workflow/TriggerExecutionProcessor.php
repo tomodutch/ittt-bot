@@ -17,9 +17,9 @@ class TriggerExecutionProcessor
     {
 
     }
+
     public function process(TriggerExecution $triggerExecution)
     {
-
         $triggerExecution->status_code = ExecutionStatus::Running;
         $triggerExecution->save();
 
@@ -27,7 +27,8 @@ class TriggerExecutionProcessor
         $steps = $triggerExecution->trigger->steps()->orderBy("order")->get();
         $currentIndex = 0;
         $doAbort = false;
-        while (!$doAbort && isset($steps[$currentIndex])) {
+        $maxLoops = 100;
+        while ($currentIndex < $maxLoops && !$doAbort && isset($steps[$currentIndex])) {
             $step = $steps[$currentIndex];
             $result = $this->stepProcessor->process($step, $context);
             $context = $context->merge($result->getVariables());
@@ -38,7 +39,7 @@ class TriggerExecutionProcessor
                     break;
 
                 case AbortDirective::class:
-                    $doAbort = false;
+                    $doAbort = true;
                     break;
 
                 case RetryDirective::class:

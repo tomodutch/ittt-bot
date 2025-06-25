@@ -10,7 +10,14 @@ class WorkflowFactory
     {
         return [
             Step::factory()->fetchWeatherAction()->create(["order" => 0]),
-            Step::factory()->conditional()->create(["order" => 1]),
+            Step::factory()->conditional()->create([
+                "order" => 1,
+                "params" => [
+                    "left" => "weather.temperature",
+                    "operator" => ">=",
+                    "right" => 10
+                ]
+            ]),
             Step::factory()->sendEmail()->create(["order" => 2]),
         ];
     }
