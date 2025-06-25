@@ -35,8 +35,4 @@ return [
         ],
     ],
 
-    'weatherapi' => [
-        'key' => env('WEATHERAPI_KEY'),
-        'base_uri' => env('WEATHERAPI_BASE_URI', 'https://api.weatherapi.com'),
-    ],
 ];
