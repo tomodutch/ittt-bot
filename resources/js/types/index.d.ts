@@ -41,3 +41,46 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Schedule {
+  id: string;
+  triggerId: string;
+  typeCode: number;
+  oneTimeAt?: string | null;
+  runTime?: string | null;
+  daysOfWeek?: number[] | null;
+  timezone: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+}
+
+export interface Trigger {
+  id: string;
+  name: string;
+  description?: string | null;
+  executionType: number;
+  schedules?: Schedule[] | null;
+  timezone: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+}
+
+export type Condition = {
+  left: string;
+  operator: string;
+  right: string;
+};
+
+export type Step = {
+  id: string;
+  type: string;
+  description?: string;
+  order?: number;
+  params: {
+    message?: string;
+    conditions?: Condition[];
+    [key: string]: any;
+  };
+};

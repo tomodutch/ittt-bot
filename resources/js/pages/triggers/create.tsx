@@ -1,0 +1,65 @@
+import React from 'react';
+import AppLayout from '@/layouts/app-layout';
+import { Head } from '@inertiajs/react';
+import TriggerBuilder, { Step } from './step-builder';
+import { ScheduleBuilder, Schedule } from './schedule-builder';
+import { type BreadcrumbItem } from '@/types';
+import { Button } from '@/components/ui/button';
+import { router } from '@inertiajs/react';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Dashboard', href: '/dashboard' },
+    { title: 'Triggers', href: '/triggers' },
+];
+
+
+export default function CreateTriggerPage() {
+    const [steps, setSteps] = React.useState<Step[]>([]);
+    const [schedule, setSchedule] = React.useState<Schedule>({
+        interval: 'daily',
+        time: '00:00',
+        daysOfWeek: [],
+        onceAt: '',
+    });
+
+    function handleSave() {
+        router.post('/triggers', {
+            name: 'New Trigger',
+            description: 'This is a new trigger',
+            executionType: 0,
+            schedules: [{
+                typeCode: 0,
+                time: schedule.time,
+                daysOfWeek: schedule.daysOfWeek,
+                oneTimeAt: schedule.onceAt,
+                timezone: "UTC"
+            }],
+            steps,
+        });
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Create Trigger" />
+
+            <div className="p-4 space-y-8 pb-24">
+                <div>
+                    <h1 className="text-2xl font-semibold mb-4">Create Trigger</h1>
+                    <ScheduleBuilder schedule={schedule} setSchedule={setSchedule} />
+                </div>
+
+                <div>
+                    <h2 className="text-xl font-semibold mb-4">Steps</h2>
+                    <TriggerBuilder steps={steps} setSteps={setSteps} />
+                </div>
+            </div>
+
+            {/* Fixed Save Button at Bottom */}
+            <div className="fixed bottom-0 left-0 right-0 z-10 border-t bg-background shadow-md">
+                <div className="max-w-4xl mx-auto px-4 py-3 flex justify-end">
+                    <Button onClick={handleSave}>Save Trigger</Button>
+                </div>
+            </div>
+        </AppLayout>
+    );
+}
