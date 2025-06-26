@@ -101,9 +101,9 @@ class TriggerController extends Controller
 
     public function show(Trigger $trigger)
     {
-        $trigger->load('schedules');
+        $trigger->load('schedules')->load("steps");
 
-        return inertia('Triggers/Show', [
+        return inertia('triggers/show', [
             'trigger' => $trigger,
         ]);
     }

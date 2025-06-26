@@ -1,11 +1,11 @@
 import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
-import TriggerBuilder, { Step } from './step-builder';
+import TriggerBuilder from './step-builder';
 import { ScheduleBuilder, Schedule } from './schedule-builder';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type Step } from '@/types';
 import { Button } from '@/components/ui/button';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -14,6 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 
 export default function CreateTriggerPage() {
+    const { errors } = usePage().props
     const [steps, setSteps] = React.useState<Step[]>([]);
     const [schedule, setSchedule] = React.useState<Schedule>({
         interval: 'daily',
@@ -41,7 +42,7 @@ export default function CreateTriggerPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Trigger" />
-
+            {JSON.stringify(errors)}
             <div className="p-4 space-y-8 pb-24">
                 <div>
                     <h1 className="text-2xl font-semibold mb-4">Create Trigger</h1>

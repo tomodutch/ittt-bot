@@ -43,44 +43,69 @@ export interface User {
 }
 
 export interface Schedule {
-  id: string;
-  triggerId: string;
-  typeCode: number;
-  oneTimeAt?: string | null;
-  runTime?: string | null;
-  daysOfWeek?: number[] | null;
-  timezone: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt?: string | null;
+    id: string;
+    triggerId: string;
+    typeCode: number;
+    oneTimeAt?: string | null;
+    runTime?: string | null;
+    daysOfWeek?: number[] | null;
+    timezone: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt?: string | null;
 }
 
 export interface Trigger {
-  id: string;
-  name: string;
-  description?: string | null;
-  executionType: number;
-  schedules?: Schedule[] | null;
-  timezone: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt?: string | null;
+    id: string;
+    name: string;
+    description?: string | null;
+    executionType: number;
+    schedules?: Schedule[] | null;
+    steps?: Step[] | null;
+    timezone: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt?: string | null;
 }
 
 export type Condition = {
-  left: string;
-  operator: string;
-  right: string;
+    left: string;
+    operator: string;
+    right: string;
 };
 
-export type Step = {
-  id: string;
-  type: string;
-  description?: string;
-  order?: number;
-  params: {
-    message?: string;
-    conditions?: Condition[];
-    [key: string]: any;
-  };
+type BaseStep = {
+    id: string;
+    type: string;
+    description?: string;
+    order?: number;
+    params: {};
+    exposedVariables?: { name: string; label: string }[];
+}
+
+export type FetchWeatherStep = BaseStep & {
+    type: 'fetchWeather';
+    params: {
+        location: string;
+    };
 };
+
+export type ConditionStep = BaseStep & {
+    type: 'condition';
+    params: {
+        left: string;
+        operator: string;
+        right: string;
+    };
+};
+
+export type SendEmailStep = BaseStep & {
+    type: 'sendEmail';
+    params: {
+        to: string;
+        subject: string;
+        body: string;
+    };
+};
+
+export type Step = SendEmailStep | FetchWeatherStep | ConditionStep;
