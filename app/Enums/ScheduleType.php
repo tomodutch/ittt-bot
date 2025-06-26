@@ -2,9 +2,9 @@
 
 namespace App\Enums;
 
-enum ScheduleType: int
+enum ScheduleType: string
 {
-    case Once = 0;
-    case Daily = 1;
-    case Weekly = 2;
+    case Once = "Once";
+    case Daily = "Daily";
+    case Weekly = "Weekly";
 }

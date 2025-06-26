@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ConditionStep, FetchWeatherStep, SendEmailStep } from '@/types';
+import { SimpleConditionalStep, FetchWeatherStep, SendEmailStep } from '@/types';
 
 export function FetchWeatherForm({ step, onChange }: {
     step: FetchWeatherStep,
@@ -22,8 +22,8 @@ export function FetchWeatherForm({ step, onChange }: {
 }
 
 export function ConditionForm({ step, onChange }: {
-    step: ConditionStep,
-    onChange: (key: keyof ConditionStep['params'], value: any) => void
+    step: SimpleConditionalStep,
+    onChange: (key: keyof SimpleConditionalStep['params'], value: any) => void
 }) {
     const OPERATORS = ['==', '!=', '<', '>'];
     const cond = step.params;
@@ -36,9 +36,9 @@ export function ConditionForm({ step, onChange }: {
             >
                 <SelectTrigger><SelectValue placeholder="Variable" /></SelectTrigger>
                 <SelectContent>
-                    {step.exposedVariables?.map((v) => (
+                    {/* {step.exposedVariables?.map((v) => (
                         <SelectItem key={v.name} value={v.name}>{v.label}</SelectItem>
-                    ))}
+                    ))} */}
                 </SelectContent>
             </Select>
 

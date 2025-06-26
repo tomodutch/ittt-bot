@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\TriggerData;
+use App\Enums\ScheduleType;
 use App\Models\Trigger;
-use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,48 +15,35 @@ class TriggerController extends Controller
 {
     public function store(Request $request)
     {
-        Log::info('Creating a new trigger', [
-            'request_data' => $request->all(),
-        ]);
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'executionType' => 'required|integer|in:0,1,2',
-
-            'schedules' => 'required|array|min:1',
-            'schedules.*.typeCode' => 'required|integer|in:0,1,2',
-            'schedules.*.oneTimeAt' => 'nullable|date',
-            'schedules.*.runTime' => 'nullable|date_format:H:i',
-            'schedules.*.daysOfWeek' => 'nullable|array',
-            'schedules.*.daysOfWeek.*' => 'integer|min:0|max:6',
-            'schedules.*.timezone' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
+        try {
+            // Validate and hydrate DTO from request input
+            TriggerData::validate($request->all());
+        } catch (ValidationException $e) {
+            // When validation fails, Inertia expects a ValidationException with errors
             if ($request->header('X-Inertia')) {
-                throw new ValidationException($validator);
+                throw new ValidationException($e->validator);
             }
-            return redirect()->back()->withErrors($validator)->withInput();
+
+            // For non-Inertia fallback
+            return redirect()->back()->withErrors($e->validator)->withInput();
         }
 
-        $validated = $validator->validated();
-
-        return DB::transaction(function () use ($validated, $request) {
+        $triggerData = TriggerData::from($request->all());
+        return DB::transaction(function () use ($triggerData, $request) {
             $trigger = Trigger::create([
-                'name' => $validated['name'],
+                'name' => $triggerData->name,
                 "user_id" => $request->user()->id,
-                'description' => $validated['description'] ?? null,
-                'execution_type' => $validated['executionType'],
+                'description' => $triggerData->description,
+                'execution_type' => $triggerData->executionType,
             ]);
 
-            foreach ($validated['schedules'] as $s) {
+            foreach ($triggerData->schedules as $s) {
                 $trigger->schedules()->create([
-                    'type_code' => $s['typeCode'],
-                    'one_time_at' => $s['typeCode'] === 0 ? $s['oneTimeAt'] : null,
-                    'run_time' => $s['typeCode'] !== 0 ? $s['runTime'] : null,
-                    'days_of_week' => $s['typeCode'] === 2 ? $s['daysOfWeek'] ?? [] : null,
-                    'timezone' => $s['timezone'],
+                    'type_code' => $s->typeCode,
+                    'one_time_at' => $s->typeCode === ScheduleType::Once ? $s->oneTimeAt : null,
+                    'run_time' => $s->typeCode !== ScheduleType::Once ? $s->runTime : null,
+                    'days_of_week' => $s->typeCode === ScheduleType::Weekly ? $s->daysOfWeek ?? [] : null,
+                    'timezone' => $s->timezone,
                 ]);
             }
 
@@ -92,7 +80,7 @@ class TriggerController extends Controller
 
     public function index()
     {
-        $triggers = Trigger::with('schedules')->latest()->get();
+        $triggers = TriggerData::collect(Trigger::with(['schedules', "steps"])->latest()->get());
 
         return inertia('triggers/index', [
             'triggers' => $triggers,
@@ -101,10 +89,10 @@ class TriggerController extends Controller
 
     public function show(Trigger $trigger)
     {
-        $trigger->load('schedules')->load("steps");
+        $triggerData = TriggerData::from($trigger->load('schedules')->load("steps"));
 
         return inertia('triggers/show', [
-            'trigger' => $trigger,
+            'trigger' => $triggerData,
         ]);
     }
 

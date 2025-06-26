@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Domain\Workflow\Steps\SimpleConditional;
+
+use App\Domain\Workflow\Contracts\StepHandlerContract;
+use App\Domain\Workflow\Directive\AbortDirective;
+use App\Domain\Workflow\Directive\ContinueDirective;
+use App\Domain\Workflow\StepExecutionContext;
+use App\Domain\Workflow\StepResultBuilder;
+use App\Enums\Operator;
+
+final class SimpleConditionalStepHandler implements StepHandlerContract
+{
+    public function process(StepExecutionContext $context, StepResultBuilder $builder): void
+    {
+		$params = SimpleConditionalStepParams::from($context->getParams());
+        $leftValue = $context->getVariable($params->left);
+        $rightValue = $params->right;
+        $operator = $params->operator; // This is now Operator enum
+
+        $result = match ($operator) {
+            Operator::EQ => $leftValue == $rightValue,
+            Operator::NEQ => $leftValue != $rightValue,
+            Operator::GT => is_numeric($leftValue) && is_numeric($rightValue) && $leftValue > $rightValue,
+            Operator::GTE => is_numeric($leftValue) && is_numeric($rightValue) && $leftValue >= $rightValue,
+            Operator::LT => is_numeric($leftValue) && is_numeric($rightValue) && $leftValue < $rightValue,
+            Operator::LTE => is_numeric($leftValue) && is_numeric($rightValue) && $leftValue <= $rightValue,
+
+            Operator::EXISTS => $context->hasVariable($params->left),
+            Operator::NOT_EXISTS => !$context->hasVariable($params->left),
+
+            Operator::NULL => $leftValue === null,
+            Operator::NOT_NULL => $leftValue !== null,
+
+            Operator::EMPTY => empty($leftValue),
+            Operator::NOT_EMPTY => !empty($leftValue),
+
+            Operator::CONTAINS => is_string($leftValue) && str_contains((string) $leftValue, (string) $rightValue),
+            Operator::STARTS_WITH => is_string($leftValue) && str_starts_with((string) $leftValue, (string) $rightValue),
+            Operator::ENDS_WITH => is_string($leftValue) && str_ends_with((string) $leftValue, (string) $rightValue),
+
+            Operator::MATCHES => is_string($leftValue) && @preg_match($rightValue, $leftValue) === 1,
+
+            Operator::IN => is_array($rightValue) && in_array($leftValue, $rightValue, true),
+            Operator::NOT_IN => is_array($rightValue) && !in_array($leftValue, $rightValue, true),
+
+            // You could throw here or handle default case if all enum cases are covered
+        };
+
+        if ($result) {
+            $builder->setDirective(new ContinueDirective());
+        } else {
+            $builder->setDirective(new AbortDirective());
+        }
+    }
+}

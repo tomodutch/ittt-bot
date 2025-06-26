@@ -1,6 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
-
+import "./generated";
 export interface Auth {
     user: User;
 }
@@ -42,70 +42,13 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
-export interface Schedule {
-    id: string;
-    triggerId: string;
-    typeCode: number;
-    oneTimeAt?: string | null;
-    runTime?: string | null;
-    daysOfWeek?: number[] | null;
-    timezone: string;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt?: string | null;
-}
-
-export interface Trigger {
-    id: string;
-    name: string;
-    description?: string | null;
-    executionType: number;
-    schedules?: Schedule[] | null;
-    steps?: Step[] | null;
-    timezone: string;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt?: string | null;
-}
-
-export type Condition = {
-    left: string;
-    operator: string;
-    right: string;
+export type Schedule = App.Data.ScheduleData;;
+export type ScheduleType = App.Enums.ScheduleType;
+export type Trigger = App.Data.TriggerData & {
+    steps: Step[]
 };
 
-type BaseStep = {
-    id: string;
-    type: string;
-    description?: string;
-    order?: number;
-    params: {};
-    exposedVariables?: { name: string; label: string }[];
-}
-
-export type FetchWeatherStep = BaseStep & {
-    type: 'fetchWeather';
-    params: {
-        location: string;
-    };
-};
-
-export type ConditionStep = BaseStep & {
-    type: 'condition';
-    params: {
-        left: string;
-        operator: string;
-        right: string;
-    };
-};
-
-export type SendEmailStep = BaseStep & {
-    type: 'sendEmail';
-    params: {
-        to: string;
-        subject: string;
-        body: string;
-    };
-};
-
-export type Step = SendEmailStep | FetchWeatherStep | ConditionStep;
+export type SendEmailStep = App.Domain.Workflow.Steps.SendEmail.SendEmailStepData;
+export type SimpleConditionalStep = App.Domain.Workflow.Steps.SimpleConditional.SimpleConditionalStepData;
+export type FetchWeatherStep = App.Domain.Workflow.Steps.Weather.WeatherStepData;
+export type Step = SendEmailStep | SimpleConditionalStep | WeatherStep;

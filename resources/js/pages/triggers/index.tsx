@@ -14,6 +14,7 @@ interface PageProps {
 
 export default function TriggerIndex() {
     const { triggers } = usePage<SharedData & PageProps>().props;
+    console.log(triggers);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -53,14 +54,14 @@ export default function TriggerIndex() {
                                         </div>
                                         <div className="mt-4 flex gap-3 text-sm">
                                             <Link
-                                                href={route('triggers.edit', trigger.id)}
+                                                href={route('triggers.edit', trigger.id || "")}
                                                 className="text-blue-500 hover:underline"
                                             >
                                                 Edit
                                             </Link>
                                             <form
                                                 method="POST"
-                                                action={route('triggers.destroy', trigger.id)}
+                                                action={route('triggers.destroy', trigger.id || "")}
                                                 onSubmit={(e) => {
                                                     e.preventDefault();
                                                     if (confirm('Are you sure you want to delete this trigger?')) {

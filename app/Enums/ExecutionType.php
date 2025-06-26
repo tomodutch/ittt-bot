@@ -2,8 +2,8 @@
 
 namespace App\Enums;
 
-enum ExecutionType: int
+enum ExecutionType: string
 {
-    case Schedule = 0;
-    case Webhook = 1;
+    case Schedule = "Schedule";
+    case Webhook = "Webhook";
 }

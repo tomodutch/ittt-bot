@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->foreignUuid("trigger_id")->constrained("triggers")->cascadeOnDelete();
-            $table->smallInteger("type_code");
+            $table->string("type_code", 55);
             $table->dateTimeTz("one_time_at")->nullable();
             $table->timeTz("time")->nullable();
             $table->json("days_of_the_week")->nullable();

@@ -6,13 +6,13 @@ import { type SharedData, type Trigger, type Step, type Schedule } from '@/types
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 function describeSchedule(schedule: Schedule) {
-    const { typeCode, runTime, oneTimeAt, daysOfWeek } = schedule;
+    const { typeCode, time: runTime, oneTimeAt, daysOfTheWeek: daysOfWeek } = schedule;
     switch (typeCode) {
-        case 0:
+        case "Once":
             return `Once at ${new Date(oneTimeAt ?? '').toLocaleString()}`;
-        case 1:
+        case "Daily":
             return `Every day at ${runTime}`;
-        case 2:
+        case "Weekly":
             const days =
                 (daysOfWeek?.length ?? 0) > 0
                     ? daysOfWeek!.map((d) => WEEKDAYS[d]).join(', ')

@@ -6,7 +6,7 @@ use App\Domain\Workflow\Directive\AbortDirective;
 use App\Domain\Workflow\Directive\ContinueDirective;
 use App\Domain\Workflow\StepExecutionContext;
 use App\Domain\Workflow\StepResultBuilder;
-use App\Domain\Workflow\Steps\SimpleConditionalStep;
+use App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepHandler;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -15,7 +15,7 @@ class SimpleConditionalStepTest extends TestCase
     #[DataProvider('conditionalCases')]
     public function testConditionalStep(array $variables, array $params, string $expectedDirectiveClass)
     {
-        $step = new SimpleConditionalStep();
+        $step = new SimpleConditionalStepHandler();
         $context = new StepExecutionContext($variables, $params);
         $builder = new StepResultBuilder();
 

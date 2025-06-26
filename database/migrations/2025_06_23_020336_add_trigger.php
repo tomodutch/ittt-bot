@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->foreignUuid('user_id')->constrained("users")->cascadeOnDelete();
             $table->string("name", 25);
             $table->string("description", 150);
-            $table->smallInteger("execution_type");
+            $table->string("execution_type", 55);
             $table->timestampsTz();
             $table->softDeletesTz();
 

@@ -1,9 +1,9 @@
 <?php
 namespace App\Enums;
 
-enum RunReason: int
+enum RunReason: string
 {
-    case Scheduled = 0;
-    case Manual = 1;
-    case Webhook = 2;
+    case Scheduled = "Scheduled";
+    case Manual = "Manual";
+    case Webhook = "Webhook";
 }

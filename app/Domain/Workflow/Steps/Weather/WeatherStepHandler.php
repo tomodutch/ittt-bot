@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Domain\Workflow\Steps;
+namespace App\Domain\Workflow\Steps\Weather;
 
 use App\Contracts\WeatherFetcherContract;
 use App\Domain\Workflow\Contracts\StepHandlerContract;
 use App\Domain\Workflow\StepExecutionContext;
 use App\Domain\Workflow\StepResultBuilder;
 
-final class FetchWeatherForLocationStep implements StepHandlerContract
+final class WeatherStepHandler implements StepHandlerContract
 {
     public function __construct(private WeatherFetcherContract $fetcher)
     {
@@ -15,8 +15,8 @@ final class FetchWeatherForLocationStep implements StepHandlerContract
     }
     public function process(StepExecutionContext $context, StepResultBuilder $builder): void
     {
-        $params = FetchWeatherForLocationParams::from($context->getParams());
-        $location = $params->getLocation();
+        $params = WeatherStepParams::from($context->getParams());
+        $location = $params->location;
         $builder->info("Fetching weather for location \"{$location}\"");
         $weather = $this->fetcher->fetchWeather($location);
         $builder->info("Fetched weather for location \"{$location}\"", [

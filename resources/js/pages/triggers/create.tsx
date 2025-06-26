@@ -2,8 +2,8 @@ import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import TriggerBuilder from './step-builder';
-import { ScheduleBuilder, Schedule } from './schedule-builder';
-import { type BreadcrumbItem, type Step } from '@/types';
+import { ScheduleBuilder } from './schedule-builder';
+import { type BreadcrumbItem, type Step, Schedule, Trigger } from '@/types';
 import { Button } from '@/components/ui/button';
 import { router, usePage } from '@inertiajs/react';
 
@@ -17,26 +17,30 @@ export default function CreateTriggerPage() {
     const { errors } = usePage().props
     const [steps, setSteps] = React.useState<Step[]>([]);
     const [schedule, setSchedule] = React.useState<Schedule>({
-        interval: 'daily',
-        time: '00:00',
-        daysOfWeek: [],
-        onceAt: '',
+        id: null,
+        triggerId: "",
+        typeCode: 'Daily',
+        time: '10:00',
+        daysOfTheWeek: [],
+        oneTimeAt: '',
+        timezone: 'UTC',
+        createdAt: null,
+        updatedAt: null,
     });
 
     function handleSave() {
-        router.post('/triggers', {
+        const newTrigger: Trigger = {
+            id: null,
             name: 'New Trigger',
             description: 'This is a new trigger',
-            executionType: 0,
-            schedules: [{
-                typeCode: 0,
-                time: schedule.time,
-                daysOfWeek: schedule.daysOfWeek,
-                oneTimeAt: schedule.onceAt,
-                timezone: "UTC"
-            }],
-            steps,
-        });
+            executionType: "Webhook",
+            schedules: [schedule],
+            steps: steps,
+            createdAt: null,
+            updatedAt: null,
+        }
+
+        router.post('/triggers', newTrigger);
     };
 
     return (

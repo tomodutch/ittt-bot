@@ -15,8 +15,8 @@ return new class extends Migration {
             $table->foreignUuid("trigger_id")->constrained("triggers")->cascadeOnDelete();
             $table->string("origin_type", 55)->nullable();
             $table->string("origin_id", 55)->nullable();
-            $table->smallInteger("status_code");
-            $table->smallInteger("run_reason_code");
+            $table->string("status_code", 55);
+            $table->string("run_reason_code", 55);
             $table->json("context");
             $table->timestampTz("finished_at")->nullable();
             $table->softDeletesTz();
