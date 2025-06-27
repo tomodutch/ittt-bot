@@ -162,9 +162,12 @@ jobs:
           BREVO_KEY=${{ secrets.BREVO_KEY }}
           EOF
 
-      - name: Pull latest Docker images
+      - name: Pull web image
         run: |
           docker pull ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }}
+
+      - name: Pull PHP-FPM image
+        run: |
           docker pull ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }}
 
       - name: create override file
