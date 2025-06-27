@@ -8,11 +8,10 @@ RUN apt-get update && apt-get install -y unzip git zip curl
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY . .
 
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-
-COPY . .
 
 RUN composer dump-autoload --optimize
 
