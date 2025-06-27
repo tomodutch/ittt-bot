@@ -164,7 +164,7 @@ jobs:
         run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml up -d --remove-orphans --force-recreate
 
       - name: Run migrations
-        run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml exec ittt_bot_web php artisan migrate --no-interaction
+        run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml exec ittt_bot_web php artisan migrate --no-interaction --force
 
       - name: Clean up unused Docker resources
         run: docker system prune -af
