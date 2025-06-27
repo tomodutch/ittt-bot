@@ -26,30 +26,41 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Build and Push Docker Image
-        id: build_push
-        run: docker buildx build --push -t ghcr.io/${{ github.repository_owner }}/ittt-bot:${{github.sha}} .
+      - name: Build and Push PHP-FPM Image
+        run: |
+          docker buildx build \
+            --push \
+            --tag ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }} \
+            --target production \
+            -f docker/common/php-fpm/Dockerfile .
 
-      - name: "Clean up old Docker images (Retention: keep latest 5)"
+      - name: Build and Push Web (Nginx) Image
+        run: |
+          docker buildx build \
+            --push \
+            --tag ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }} \
+            -f docker/production/nginx/Dockerfile .
+
+      - name: Clean up old Docker images (Retention: keep latest 5)
         env:
           GH_TOKEN: ${{ secrets.GHCR_PAT }}
-          REPO: ${{ github.repository_owner }}/ittt-bot
         run: |
-          echo "Cleaning up old Docker images..."
+          for IMAGE in ittt-bot-web ittt-bot-php-fpm; do
+            echo "Cleaning up old versions for $IMAGE..."
+            TAGS_TO_DELETE=$(gh api -H "Accept: application/vnd.github+json" \
+              /users/${{ github.repository_owner }}/packages/container/$IMAGE/versions \
+              --jq '.[] | {id: .id, created_at: .created_at} | @json' | \
+              jq -s 'sort_by(.created_at) | reverse | .[5:] | .[].id')
 
-          TAGS_TO_DELETE=$(gh api -H "Accept: application/vnd.github+json" \
-            /users/${{ github.repository_owner }}/packages/container/ittt-bot/versions \
-            --jq '.[] | {id: .id, created_at: .created_at, metadata: .metadata.container.tags[0]} | @json' | \
-            jq -s 'sort_by(.created_at) | reverse | .[5:] | .[].id')
-
-          if [ -n "$TAGS_TO_DELETE" ]; then
-            for ID in $TAGS_TO_DELETE; do
-              echo "Deleting package version ID: $ID"
-              gh api --method DELETE /user/packages/container/ittt-bot/versions/$ID
-            done
-          else
-            echo "No old images to delete"
-          fi
+            if [ -n "$TAGS_TO_DELETE" ]; then
+              for ID in $TAGS_TO_DELETE; do
+                echo "Deleting package version ID: $ID for $IMAGE"
+                gh api --method DELETE /user/packages/container/$IMAGE/versions/$ID
+              done
+            else
+              echo "No old images to delete for $IMAGE"
+            fi
+          done
 
   deploy:
     if: >
@@ -72,6 +83,7 @@ jobs:
           cat <<EOF > .env
           IMAGE_TAG=${{ github.sha }}
           REPO_OWNER=${{ github.repository_owner }}
+          NGINX_PORT=8004
 
           APP_NAME=ITTT_BOT
           APP_ENV=production
@@ -150,21 +162,25 @@ jobs:
           BREVO_KEY=${{ secrets.BREVO_KEY }}
           EOF
 
-      - name: "Pull latest Docker image by commit SHA tag"
-        run: docker pull ghcr.io/${{ github.repository_owner }}/ittt-bot:${{ github.sha }}
+      - name: Pull latest Docker images
+        run: |
+          docker pull ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }}
+          docker pull ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }}
 
       - name: create override file
         run : |
             cat <<EOF > docker-compose.override.yml
             services:
-                ittt_bot_web:
-                    image: ghcr.io/${{ github.repository_owner }}/ittt-bot:${{ github.sha }}
+              web:
+                image: ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }}
+              php-fpm:
+                image: ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }}
             EOF
       - name: Start containers using pulled image
-        run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml up -d --remove-orphans --force-recreate
+        run: docker compose --env-file .env -f compose.prod.yml -f docker-compose.override.yml up -d --remove-orphans --force-recreate
 
       - name: Run migrations
-        run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml exec ittt_bot_web php artisan migrate --no-interaction --force
+        run: docker compose --env-file .env -f compose.prod.yml -f docker-compose.override.yml exec php-fpm php artisan migrate --no-interaction --force
 
       - name: Clean up unused Docker resources
         run: docker system prune -af

@@ -1,0 +1,101 @@
+services:
+  web:
+    image: ghcr.io/${REPO_OWNER}/ittt-bot-web:${IMAGE_TAG}
+    restart: unless-stopped # Automatically restart unless the service is explicitly stopped
+    env_file:
+      - .env
+    volumes:
+      # Mount the 'ittt-bot-storage-production' volume to '/var/www/storage' inside the container.
+      # -----------------------------------------------------------
+      # This volume stores persistent data like uploaded files and cache.
+      # The ':ro' option mounts it as read-only in the 'web' service because Nginx only needs to read these files.
+      # The 'php-fpm' service mounts the same volume without ':ro' to allow write operations.
+      # -----------------------------------------------------------
+      - ittt-bot-storage-production:/var/www/storage:ro
+      - ittt-bot-public-assets:/var/www/public/build:ro
+    networks:
+      - ittt-bot-production
+    ports:
+      # Map port 80 inside the container to the port specified by 'NGINX_PORT' on the host machine.
+      # -----------------------------------------------------------
+      # This allows external access to the Nginx web server running inside the container.
+      # For example, if 'NGINX_PORT' is set to '8080', accessing 'http://localhost:8080' will reach the application.
+      # -----------------------------------------------------------
+      - "${NGINX_PORT:-8004}:80"
+    depends_on:
+      php-fpm:
+        condition: service_healthy  # Wait for php-fpm health check
+
+  php-fpm:
+    # For the php-fpm service, we will create a custom image to install the necessary PHP extensions and setup proper permissions.
+    image: ghcr.io/${REPO_OWNER}/ittt-bot-php-fpm:${IMAGE_TAG}
+    restart: unless-stopped
+    volumes:
+      - ittt-bot-public-assets:/var/www/public/build  # Mount built public assets to ensure the manifest.json and hashed files match between Nginx and PHP-FPM
+      - ittt-bot-storage-production:/var/www/storage  # Mount the storage volume
+    env_file:
+      - .env
+    networks:
+      - ittt-bot-production
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    # The 'depends_on' attribute with 'condition: service_healthy' ensures that
+    # this service will not start until the 'postgres' service passes its health check.
+    # This prevents the application from trying to connect to the database before it's ready.
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17.5
+    restart: unless-stopped
+    user: postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - ittt-bot-data-production:/var/lib/postgresql/data
+    networks:
+      - ittt-bot-production
+    # Health check for PostgreSQL
+    # -----------------------------------------------------------
+    # Health checks allow Docker to determine if a service is operational.
+    # The 'pg_isready' command checks if PostgreSQL is ready to accept connections.
+    # This prevents dependent services from starting before the database is ready.
+    # -----------------------------------------------------------
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped  # Automatically restart unless the service is explicitly stopped
+    networks:
+      - ittt-bot-production
+    # Health check for Redis
+    # -----------------------------------------------------------
+    # Checks if Redis is responding to the 'PING' command.
+    # This ensures that the service is not only running but also operational.
+    # -----------------------------------------------------------
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  # Attach the service to the 'laravel' network.
+  # -----------------------------------------------------------
+  # This custom network allows all services within it to communicate using their service names as hostnames.
+  # For example, 'php-fpm' can connect to 'postgres' by using 'postgres' as the hostname.
+  # -----------------------------------------------------------
+  ittt-bot-production:
+
+volumes:
+  ittt-bot-data-production:
+  ittt-bot-storage-production:
+  ittt-bot-public-assets:
