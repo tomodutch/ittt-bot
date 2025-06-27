@@ -41,4 +41,9 @@ class TriggerExecution extends Model
     {
         return $this->belongsToMany(Schedule::class, 'schedule_trigger_execution');
     }
+
+    public function logs()
+    {
+        return $this->hasMany(StepExecutionLog::class, 'trigger_execution_id');
+    }
 }

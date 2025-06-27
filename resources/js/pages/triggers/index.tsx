@@ -44,14 +44,23 @@ export default function TriggerIndex() {
                                 {triggers.map((trigger) => (
                                     <li
                                         key={trigger.id}
-                                        className="rounded-lg border border-border p-4 shadow-sm dark:border-sidebar-border bg-white dark:bg-neutral-900"
+                                        className="rounded-lg border border-border p-4 shadow-sm dark:border-sidebar-border bg-white dark:bg-neutral-900 flex flex-col"
                                     >
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-sm text-muted-foreground uppercase tracking-wide">
-                                                {trigger.executionType}
-                                            </span>
-                                            {/* <h3 className="text-lg font-semibold">At {trigger.time}</h3> */}
-                                        </div>
+                                        <Link
+                                            href={route('triggers.show', trigger.id || "")}
+                                            className="flex-grow cursor-pointer"
+                                        >
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-sm text-muted-foreground uppercase tracking-wide">
+                                                    {trigger.executionType}
+                                                </span>
+                                                <h3 className="mt-2 text-lg font-semibold">{trigger.name}</h3>
+                                                {trigger.description && (
+                                                    <p className="mt-1 text-sm text-muted-foreground">{trigger.description}</p>
+                                                )}
+                                            </div>
+                                        </Link>
+
                                         <div className="mt-4 flex gap-3 text-sm">
                                             <Link
                                                 href={route('triggers.edit', trigger.id || "")}

@@ -16,7 +16,7 @@ class SimpleConditionalStepTest extends TestCase
     public function testConditionalStep(array $variables, array $params, string $expectedDirectiveClass)
     {
         $step = new SimpleConditionalStepHandler();
-        $context = new StepExecutionContext($variables, $params);
+        $context = new StepExecutionContext(collect($variables), collect($params));
         $builder = new StepResultBuilder();
 
         $step->process($context, $builder);

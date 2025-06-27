@@ -3,41 +3,42 @@
 namespace App\Domain\Workflow;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 final class StepExecutionContext
 {
-    public function __construct(private array $variables, private array $params = [])
+    public function __construct(private Collection $variables, private Collection $params = new Collection())
     {
     }
 
     public function getVariable(string $key)
     {
-        return Arr::get($this->variables, $key, null);
+        return Arr::get($this->variables->all(), $key, null);
     }
 
-    public function getVariables()
+    public function getVariables(): Collection
     {
         return $this->variables;
     }
 
-    public function withParams(array $params)
+    public function withParams(Collection $params): self
     {
         return new self($this->variables, $params);
     }
 
-    public function getParams(): array
+    public function getParams(): Collection
     {
         return $this->params;
     }
 
-    public function hasVariable(string $key)
+    public function hasVariable(string $key): bool
     {
-        return Arr::has($this->variables, $key);
+        return Arr::has($this->variables->all(), $key);
     }
 
-    public function merge(array $newVariables): self
+    public function merge(Collection $newVariables): self
     {
-        $merged = array_replace_recursive($this->variables, $newVariables);
-        return new self($merged, $this->params);
+        $mergedArray = array_replace_recursive($this->variables->all(), $newVariables->all());
+        return new self(collect($mergedArray), $this->params);
     }
 }

@@ -3,15 +3,16 @@
 namespace Tests\Feature\Workflow\Steps;
 
 use App\Domain\Workflow\StepExecutionContext;
+use Illuminate\Support\Collection;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class StepExecutionContextTest extends TestCase
 {
     #[DataProvider('getVariableProvider')]
-    public function testGetVariable(array $variables, string $key, $expected)
+    public function testGetVariable(array $variables, string $key, mixed $expected): void
     {
-        $context = new StepExecutionContext($variables);
+        $context = new StepExecutionContext(collect($variables));
         $this->assertSame($expected, $context->getVariable($key));
     }
 
@@ -42,9 +43,9 @@ class StepExecutionContextTest extends TestCase
     }
 
     #[DataProvider('hasVariableProvider')]
-    public function testHasVariable(array $variables, string $key, bool $expected)
+    public function testHasVariable(array $variables, string $key, bool $expected): void
     {
-        $context = new StepExecutionContext($variables);
+        $context = new StepExecutionContext(collect($variables));
         $this->assertSame($expected, $context->hasVariable($key));
     }
 
@@ -74,13 +75,13 @@ class StepExecutionContextTest extends TestCase
         ];
     }
 
-    public function testMergeCreatesNewContextAndMergesVariables()
+    public function testMergeCreatesNewContextAndMergesVariables(): void
     {
         $variables = [
             'foo' => ['bar' => 1, 'baz' => 2],
             'simple' => 'value1',
         ];
-        $context = new StepExecutionContext($variables);
+        $context = new StepExecutionContext(collect($variables));
 
         $newVariables = [
             'foo' => ['baz' => 20, 'newKey' => 30],
@@ -88,7 +89,7 @@ class StepExecutionContextTest extends TestCase
             'added' => 'newValue',
         ];
 
-        $mergedContext = $context->merge($newVariables);
+        $mergedContext = $context->merge(collect($newVariables));
 
         $this->assertSame(2, $context->getVariable('foo.baz'));
         $this->assertNull($context->getVariable('added'));
@@ -97,18 +98,19 @@ class StepExecutionContextTest extends TestCase
         $this->assertSame('newValue', $mergedContext->getVariable('added'));
     }
 
-    public function testWithParamsReturnsNewContextWithUpdatedParams()
+    public function testWithParamsReturnsNewContextWithUpdatedParams(): void
     {
         $variables = ['key' => 'value'];
         $params = ['param1' => 'value1'];
 
-        $context = new StepExecutionContext($variables, $params);
+        $context = new StepExecutionContext(collect($variables), collect($params));
         $newParams = ['param2' => 'value2'];
-        $newContext = $context->withParams($newParams);
+        $newContext = $context->withParams(collect($newParams));
 
-        $this->assertSame($params, $context->getParams());
-        $this->assertSame($newParams, $newContext->getParams());
-        $this->assertSame($variables, $newContext->getVariables());
+        $this->assertEqualsCanonicalizing($params, $context->getParams()->toArray());
+        $this->assertEqualsCanonicalizing($newParams, $newContext->getParams()->toArray());
+        $this->assertEqualsCanonicalizing($variables, $newContext->getVariables()->toArray());
+
         $this->assertNotSame($context, $newContext);
     }
 }

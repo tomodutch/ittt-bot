@@ -107,7 +107,10 @@ class TriggerController extends Controller
 
     public function show(Trigger $trigger)
     {
-        $triggerData = TriggerData::from($trigger->load('schedules')->load("steps"));
+        $triggerData = TriggerData::from(
+            $trigger->load('schedules')
+            ->load("executions")
+            ->load("steps"));
 
         return inertia('triggers/show', [
             'trigger' => $triggerData,

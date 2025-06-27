@@ -2,21 +2,27 @@
 
 namespace App\Domain\Workflow;
 
+use App\Enums\LogLevel as AppLogLevel;
 use App\Domain\Workflow\Directive\ContinueDirective;
 use App\Domain\Workflow\Directive\FlowDirective;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Str;
 
 final class StepResultBuilder implements LoggerInterface
 {
-    private array $variables = [];
-    private ?FlowDirective $directive = null;
-    private array $logs = [];
+    public function __construct(
+        private readonly Collection $variables = new Collection(),
+        private ?FlowDirective $directive = null,
+        private readonly Collection $logs = new Collection()
+    ) {
+    }
 
     public function setVariable(string $key, mixed $value): self
     {
-        Arr::set($this->variables, $key, $value);
+        $this->variables->put($key, $value);
         return $this;
     }
 
@@ -37,12 +43,13 @@ final class StepResultBuilder implements LoggerInterface
 
     public function log($level, $message, array $context = []): void
     {
-        $this->logs[] = [
+        $level = AppLogLevel::tryFrom(\Illuminate\Support\Str::pascal($level)) ?? AppLogLevel::Info;
+        $this->logs->push([
             'level' => $level,
             'message' => $message,
             'context' => $context,
             'timestamp' => (new \DateTimeImmutable())->format(DATE_ATOM),
-        ];
+        ]);
     }
 
     public function emergency($message, array $context = []): void

@@ -19,7 +19,7 @@ class StepProcessor implements StepProcessorContract
     public function process(Step $step, StepExecutionContext $context): StepResult
     {
         $builder = new StepResultBuilder();
-        $scopedContext = $context->withParams($step->params);
+        $scopedContext = $context->withParams(collect($step->params));
         try {
             $step->type->getParamsClass()::from($step->params);
             $handler = $this->resolver->resolve($step);

@@ -41,4 +41,9 @@ class Trigger extends Model
     {
         return $this->hasMany(Step::class);
     }
+
+    public function executions()
+    {
+        return $this->hasMany(TriggerExecution::class);
+    }
 }

@@ -18,6 +18,8 @@ class TriggerData extends Data
         public ExecutionType $executionType,
         #[DataCollectionOf(ScheduleData::class)]
         public Collection $schedules,
+        #[DataCollectionOf(TriggerExecutionData::class)]
+        public Collection $executions,
         #[DataCollectionOf(StepData::class)]
         #[WithCast(StepDataPolymorphicCaster::class)]
         public Collection $steps,

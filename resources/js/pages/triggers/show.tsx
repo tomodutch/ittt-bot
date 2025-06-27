@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card } from '@/components/ui/card';
 import { type SharedData, type Trigger, type Step, type Schedule } from '@/types';
@@ -75,55 +75,89 @@ function describeSchedule(schedule: Schedule) {
 }
 
 function describeStep(step: Step) {
-    switch (step.type) {
-        case "http.weather.location":
-            return `Fetch weather for "${step.params.location}"`;
-        case 'logic.conditional.simple':
-            const c = step.params;
-            if (!c) return 'Condition (missing)';
-            return `If ${c.left} ${c.operator} ${c.right}`;
-        case 'notify.email.send':
-            return `Send email to "${step.params.to}" with subject "${step.params.subject}"`;
-        default:
-            return 'Unknown step';
-    }
+  switch (step.type) {
+    case "http.weather.location":
+      return `Fetch weather for "${step.params.location}"`;
+    case 'logic.conditional.simple':
+      const c = step.params;
+      if (!c) return 'Condition (missing)';
+      return `If ${c.left} ${c.operator} ${c.right}`;
+    case 'notify.email.send':
+      return `Send email to "${step.params.to}" with subject "${step.params.subject}"`;
+    default:
+      return 'Unknown step';
+  }
 }
 
 interface PageProps {
-    trigger: Trigger;
+  trigger: Trigger;
 }
 
 export default function ShowTrigger() {
-    const { trigger } = usePage<SharedData & PageProps>().props;
+  const { trigger } = usePage<SharedData & PageProps>().props;
 
-    return (
-        <AppLayout>
-            <Head title={trigger.name} />
+  return (
+    <AppLayout>
+      <Head title={trigger.name} />
 
-            <div className="p-6 space-y-6">
-                <h1 className="text-3xl font-semibold">{trigger.name}</h1>
-                {trigger.description && <p className="text-muted-foreground">{trigger.description}</p>}
+      <div className="p-6 space-y-6">
+        <h1 className="text-3xl font-semibold">{trigger.name}</h1>
+        {trigger.description && <p className="text-muted-foreground">{trigger.description}</p>}
 
-                <Card className="p-4 space-y-2">
-                    <h2 className="text-xl font-semibold">Schedule</h2>
-                    <ul className="list-disc ml-6">
-                        {trigger?.schedules?.map((s, i) => (
-                            <li key={i}>{describeSchedule(s)}</li>
-                        ))}
-                    </ul>
-                </Card>
+        <Card className="p-4 space-y-2">
+          <h2 className="text-xl font-semibold">Schedule</h2>
+          <ul className="list-disc ml-6">
+            {trigger?.schedules?.map((s, i) => (
+              <li key={i}>{describeSchedule(s)}</li>
+            ))}
+          </ul>
+        </Card>
 
-                {trigger.steps && trigger.steps.length > 0 && (
-                    <Card className="p-4 space-y-2">
-                        <h2 className="text-xl font-semibold">Steps</h2>
-                        <ol className="list-decimal ml-6">
-                            {trigger.steps.map((step, i) => (
-                                <li key={i}>{describeStep(step)}</li>
-                            ))}
-                        </ol>
-                    </Card>
-                )}
-            </div>
-        </AppLayout>
-    );
+        {trigger.steps && trigger.steps.length > 0 && (
+          <Card className="p-4 space-y-2">
+            <h2 className="text-xl font-semibold">Steps</h2>
+            <ol className="list-decimal ml-6">
+              {trigger.steps.map((step, i) => (
+                <li key={i}>{describeStep(step)}</li>
+              ))}
+            </ol>
+          </Card>
+        )}
+
+        <Card className="p-4 space-y-2">
+          <h2 className="text-xl font-semibold">Executions</h2>
+          {trigger.executions.length === 0 ? (
+            <p className="text-muted-foreground">No executions yet.</p>
+          ) : (
+            <ul className="divide-y">
+              {trigger.executions.map((exec) => (
+                <li key={exec.id} className="py-2">
+                  <Link href={route('executions.show', {
+                    triggerId: trigger.id,
+                    executionId: exec.id,
+                  })} className="block hover:bg-muted rounded-md p-2">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium">
+                          {exec.runReasonCode} — {exec.statusCode ?? 'Unknown'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Started at: {new Date(exec.createdAt!).toLocaleString()}
+                        </div>
+                        {exec.finishedAt && (
+                          <div className="text-sm text-muted-foreground">
+                            Finished at: {new Date(exec.finishedAt).toLocaleString()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+      </div>
+    </AppLayout>
+  );
 }
