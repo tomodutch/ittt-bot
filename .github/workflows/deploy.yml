@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and Push Docker Image
         id: build_push
-        run: docker buildx build --push --no-cache -t ghcr.io/${{ github.repository_owner }}/ittt-bot:${{github.sha}} .
+        run: docker buildx build --push -t ghcr.io/${{ github.repository_owner }}/ittt-bot:${{github.sha}} .
 
       - name: "Clean up old Docker images (Retention: keep latest 5)"
         env:
