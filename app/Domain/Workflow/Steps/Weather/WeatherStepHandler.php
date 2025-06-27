@@ -24,6 +24,7 @@ final class WeatherStepHandler implements StepHandlerContract
         ]);
 
         $builder->setVariable("temperatureCelsius", $weather->current->temperatureCelsius);
+        $builder->setVariable("weatherCondition", $weather->current->weatherCondition->text);
         $builder->setVariable("weatherConditionCode", $weather->current->weatherCondition->conditionCode);
     }
 }
