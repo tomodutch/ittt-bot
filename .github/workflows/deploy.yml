@@ -76,7 +76,7 @@ jobs:
           APP_NAME=ITTT_BOT
           APP_ENV=production
           APP_KEY=${{ secrets.APP_KEY }}
-          APP_DEBUG=false
+          APP_DEBUG=true
           APP_URL=https://ittt-bot.app
 
           APP_LOCALE=en
