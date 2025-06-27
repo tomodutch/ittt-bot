@@ -1,22 +1,8 @@
-# Stage 1: Dependencies Build with Composer
-FROM php:8.2-cli AS build
+# ----------------------
+# Stage 1: PHP base with extensions
+# ----------------------
+FROM php:8.2-fpm-alpine AS php-base
 
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y unzip git zip curl \
- && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Copy only files needed to install dependencies (cached unless deps change)
-COPY composer.json composer.lock ./
-
-# Install PHP dependencies
-RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
- && composer dump-autoload --optimize
-
-# Stage 2: Final production container
-FROM php:8.2-fpm-alpine
-
-# Install system packages and PHP extensions
 RUN apk add --no-cache \
     bash \
     curl \
@@ -44,22 +30,42 @@ RUN docker-php-ext-install \
     pcntl \
     opcache
 
+# ----------------------
+# Stage 2: Composer (dependencies only)
+# ----------------------
+FROM php:8.2-cli AS composer
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y unzip git zip curl \
+ && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+COPY composer.json composer.lock ./
+
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
+ && composer dump-autoload --optimize
+
+# ----------------------
+# Stage 3: Final app image
+# ----------------------
+FROM php-base AS final
+
 WORKDIR /var/www/html
 
-# Copy vendor directory and optimized autoloader from build stage
-COPY --from=build /app/vendor /var/www/html/vendor
-COPY --from=build /app/composer.* /var/www/html/
+# Copy just the built vendor directory
+COPY --from=composer /app/vendor ./vendor
+COPY --from=composer /app/composer.* ./
 
-# Copy application code separately to allow app changes without reinstalling vendor
-COPY . /var/www/html
+# Then copy the actual app code
+COPY . .
 
-# Set permissions
+# Set up app permissions
 RUN addgroup -g 1000 www \
  && adduser -u 1000 -G www -s /bin/sh -D www \
  && chown -R www:www /var/www/html \
  && chmod -R 755 /var/www/html
 
-# Copy supervisor and cron job config
+# Add supervisor and cron setup
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/laravel-cron /etc/periodic/1min/laravel-cron
 RUN chmod +x /etc/periodic/1min/laravel-cron
