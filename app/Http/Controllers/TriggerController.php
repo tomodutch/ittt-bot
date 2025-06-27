@@ -98,7 +98,7 @@ class TriggerController extends Controller
 
     public function index()
     {
-        $triggers = TriggerData::collect(Trigger::with(['schedules', "steps"])->latest()->get());
+        $triggers = TriggerData::collect(Trigger::with([])->latest()->get());
 
         return inertia('triggers/index', [
             'triggers' => $triggers,

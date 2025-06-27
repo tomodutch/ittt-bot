@@ -126,11 +126,11 @@ export default function ShowTrigger() {
 
         <Card className="p-4 space-y-2">
           <h2 className="text-xl font-semibold">Executions</h2>
-          {trigger.executions.length === 0 ? (
+          {trigger.executions?.length === 0 ? (
             <p className="text-muted-foreground">No executions yet.</p>
           ) : (
             <ul className="divide-y">
-              {trigger.executions.map((exec) => (
+              {trigger.executions?.map((exec) => (
                 <li key={exec.id} className="py-2">
                   <Link href={route('executions.show', {
                     triggerId: trigger.id,

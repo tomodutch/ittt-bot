@@ -35,6 +35,7 @@ export default function CreateTriggerPage() {
             description: 'This is a new trigger',
             executionType: "Webhook",
             schedules: [schedule],
+            executions: [],
             steps: steps,
             createdAt: null,
             updatedAt: null,

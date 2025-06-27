@@ -17,12 +17,12 @@ class TriggerData extends Data
         public string $description,
         public ExecutionType $executionType,
         #[DataCollectionOf(ScheduleData::class)]
-        public Collection $schedules,
+        public ?Collection $schedules,
         #[DataCollectionOf(TriggerExecutionData::class)]
-        public Collection $executions,
+        public ?Collection $executions = new Collection(),
         #[DataCollectionOf(StepData::class)]
         #[WithCast(StepDataPolymorphicCaster::class)]
-        public Collection $steps,
+        public ?Collection $steps,
         public ?CarbonImmutable $createdAt,
         public ?CarbonImmutable $updatedAt,
     ) {
