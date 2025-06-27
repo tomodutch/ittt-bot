@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   workflow_run:
-    workflows: ["linter", "tests"]
+    workflows: ["tests"]
     types:
       - completed
 
