@@ -1,8 +1,8 @@
 services:
-  iiit_bot_web:
+  ittt_bot_web:
     image: ghcr.io/${REPO_OWNER}/ittt-bot:${IMAGE_TAG}
-    expose:
-      - "9000"           # expose to other containers, but no host binding
+    ports:
+      - "9000:9000"
     depends_on:
       - db
     env_file:
@@ -12,10 +12,10 @@ services:
   db:
     image: postgres:17.5
     volumes:
-      - iiit_bot_pgdata:/var/lib/postgresql/iiit_bot_data
+      - ittt_bot_pgdata:/var/lib/postgresql/ittt_bot_data
     env_file:
       - .env
     restart: always
 
 volumes:
-  iiit_bot_pgdata:
+  ittt_bot_pgdata:
