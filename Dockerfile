@@ -66,6 +66,9 @@ RUN addgroup -g 1000 www \
  && chown -R www:www /var/www/html \
  && chmod -R 755 /var/www/html
 
+# Ensure PHP-FPM listens on all interfaces
+RUN sed -i 's|^listen = .*|listen = 0.0.0.0:9000|' /usr/local/etc/php-fpm.d/www.conf
+
 # Add supervisor and cron setup
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/laravel-cron /etc/periodic/1min/laravel-cron
