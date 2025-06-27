@@ -13,12 +13,16 @@ final class SimpleConditionalStepHandler implements StepHandlerContract
 {
     public function process(StepExecutionContext $context, StepResultBuilder $builder): void
     {
-		$params = SimpleConditionalStepParams::from($context->getParams());
+        $params = SimpleConditionalStepParams::from($context->getParams());
         $leftValue = $context->getVariable($params->left);
         $rightValue = $params->right;
         $operator = $params->operator;
 
-        $builder->info("Evaluating condition: \"{$leftValue}\" {$operator->value} {$params->right}");
+        $builder->info("Evaluating condition:", [
+            "left" => $leftValue,
+            "operator" => $operator->value,
+            "right" => $rightValue
+        ]);
 
         $result = match ($operator) {
             Operator::EQ => $leftValue == $rightValue,
@@ -45,17 +49,23 @@ final class SimpleConditionalStepHandler implements StepHandlerContract
 
             Operator::IN => is_array($rightValue) && in_array($leftValue, $rightValue, true),
             Operator::NOT_IN => is_array($rightValue) && !in_array($leftValue, $rightValue, true),
-
-            // You could throw here or handle default case if all enum cases are covered
         };
 
 
         if ($result) {
-            $builder->info("Condition evaluated to true: {$leftValue} {$operator->value} {$params->right}");
+            $builder->info("Condition evaluated to true", [
+                "left" => $leftValue,
+                "operator" => $operator->value,
+                "right" => $rightValue
+            ]);
             $builder->info("Continuing workflow execution");
             $builder->setDirective(new ContinueDirective());
         } else {
-            $builder->info("Condition evaluated to false: {$leftValue} {$operator->value} {$params->right}");
+            $builder->info("Condition evaluated to false", [
+                "left" => $leftValue,
+                "operator" => $operator->value,
+                "right" => $rightValue
+            ]);
             $builder->info("Aborting workflow execution");
             $builder->setDirective(new AbortDirective());
         }

@@ -20,6 +20,8 @@
         "saloonphp/saloon": "^3.0",
         "spatie/laravel-data": "^4.17",
         "spatie/laravel-typescript-transformer": "*",
+        "symfony/brevo-mailer": "^7.3",
+        "symfony/http-client": "^7.3",
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
