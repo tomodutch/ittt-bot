@@ -1,4 +1,4 @@
-name: CI/CD
+name: deploy
 
 on:
   workflow_run:
@@ -51,59 +51,118 @@ jobs:
             echo "No old images to delete"
           fi
 
-  # deploy:
-  #   if: github.ref == 'refs/heads/main'
-  #   runs-on: [self-hosted]
-  #   needs: build_and_push
-  #   steps:
-  #     - name: Log in to GitHub Container Registry
-  #       uses: docker/login-action@v3.4.0
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GHCR_PAT }}
+  deploy:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: [self-hosted]
+    needs: build_and_push
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
 
-  #     - name: Create .env file
-  #       run: |
-  #         cat <<EOF > .env
-  #         GITHUB_ID=${{ secrets.NEXTAUTH_GITHUB_ID }}
-  #         GITHUB_SECRET=${{ secrets.NEXTAUTH_GITHUB_SECRET }}
-  #         NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-  #         DB_NAME=${{ vars.DB_NAME }}
-  #         DB_USER=${{ vars.DB_USER }}
-  #         DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-  #         DATABASE_URL=postgresql://${{ vars.DB_USER }}:${{ secrets.DB_PASSWORD }}@db:5432/${{ vars.DB_NAME }}
-  #         POSTGRES_DB=${{ vars.DB_NAME }}
-  #         POSTGRES_USER=${{ vars.DB_USER }}
-  #         POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}
-  #         SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
-  #         NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
-  #         SERVER_SENTRY_DSN=${{ vars.SERVER_SENTRY_DSN }}
-  #         NEXTAUTH_URL=https://itadaki.app
-  #         IMAGE_TAG=${{ github.sha }}
-  #         REPO_OWNER=${{ github.repository_owner }}
-  #         AUTH_TRUST_HOST=true
-  #         USDA_API_KEY=${{ vars.USDA_API_KEY }}
-  #         EOF
+      - name: Create .env file
+        run: |
+          cat <<EOF > .env
+          IMAGE_TAG=${{ github.sha }}
+          REPO_OWNER=${{ github.repository_owner }}
 
-  #     - name: "Pull latest Docker image by commit SHA tag"
-  #       run: docker pull ghcr.io/${{ github.repository_owner }}/ittt-bot:${{ github.sha }}
+          APP_NAME=ITTT_BOT
+          APP_ENV=production
+          APP_KEY=${{ secrets.APP_KEY }}
+          APP_DEBUG=false
+          APP_URL=https://iiit-bot.app
 
-  #     - name: create override file
-  #       run : |
-  #           cat <<EOF > docker-compose.override.yml
-  #           services:
-  #               itadaki_web:
-  #                   image: ghcr.io/${{ github.repository_owner }}/ittt-bot:${{ github.sha }}
-  #           EOF
-  #     - name: Start containers using pulled image
-  #       run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml up -d --remove-orphans --force-recreate
+          APP_LOCALE=en
+          APP_FALLBACK_LOCALE=en
+          APP_FAKER_LOCALE=en_US
 
-  #     - name: Run Prisma migrations
-  #       run: docker compose exec itadaki_web npx prisma migrate deploy
+          APP_MAINTENANCE_DRIVER=file
+          # APP_MAINTENANCE_STORE=database
 
-  #     - name: Run Prisma seed
-  #       run: docker compose exec itadaki_web npx prisma db seed
+          PHP_CLI_SERVER_WORKERS=4
 
-  #     - name: Clean up unused Docker resources
-  #       run: docker system prune -af
+          BCRYPT_ROUNDS=12
+
+          LOG_CHANNEL=stack
+          LOG_STACK=single
+          LOG_DEPRECATIONS_CHANNEL=null
+          LOG_LEVEL=info
+
+          DB_CONNECTION=pgsql
+          DB_HOST=db
+          DB_PORT=5432
+          DB_DATABASE=${{ vars.DB_NAME }}
+          DB_USERNAME=${{ vars.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+          POSTGRES_DB=${{ vars.DB_NAME }}
+          POSTGRES_USER=${{ vars.DB_USER }}
+          POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+          SESSION_DRIVER=database
+          SESSION_LIFETIME=120
+          SESSION_ENCRYPT=false
+          SESSION_PATH=/
+          SESSION_DOMAIN=null
+
+          BROADCAST_CONNECTION=log
+          FILESYSTEM_DISK=local
+          QUEUE_CONNECTION=database
+
+          CACHE_STORE=database
+          # CACHE_PREFIX=
+
+          MEMCACHED_HOST=127.0.0.1
+
+          REDIS_CLIENT=phpredis
+          REDIS_HOST=127.0.0.1
+          REDIS_PASSWORD=null
+          REDIS_PORT=6379
+
+          MAIL_MAILER=brevo
+          MAIL_SCHEME=null
+          MAIL_HOST=127.0.0.1
+          MAIL_PORT=2525
+          MAIL_USERNAME=null
+          MAIL_PASSWORD=null
+          MAIL_FROM_ADDRESS="bot@ittt-bot.app"
+          MAIL_FROM_NAME="ITTT Bot"
+
+          AWS_ACCESS_KEY_ID=
+          AWS_SECRET_ACCESS_KEY=
+          AWS_DEFAULT_REGION=us-east-1
+          AWS_BUCKET=
+          AWS_USE_PATH_STYLE_ENDPOINT=false
+
+          VITE_APP_NAME="${APP_NAME}"
+
+          # API KEYS
+          
+          WEATHERAPI_KEY=${{ secrets.WEATHERAPI_KEY }}
+          WEATHERAPI_BASE_URI=https://api.weatherapi.com
+          BREVO_KEY=${{ secrets.BREVO_KEY }}
+          EOF
+
+      - name: "Pull latest Docker image by commit SHA tag"
+        run: docker pull ghcr.io/${{ github.repository_owner }}/ittt-bot:${{ github.sha }}
+
+      - name: create override file
+        run : |
+            cat <<EOF > docker-compose.override.yml
+            services:
+                ittt_bot_web:
+                    image: ghcr.io/${{ github.repository_owner }}/ittt-bot:${{ github.sha }}
+            EOF
+      - name: Start containers using pulled image
+        run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml up -d --remove-orphans --force-recreate
+
+      - name: Run migrations
+        run: docker compose exec ittt_bot_web php artisan migrate --no-interaction
+
+      - name: Clean up unused Docker resources
+        run: docker system prune -af
