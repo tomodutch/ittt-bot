@@ -2,18 +2,17 @@
 
 namespace App\Domain\Workflow\Steps\Weather;
 
+use App\Data\StepData;
 use App\Domain\Workflow\Steps\StepType;
-use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 
-class WeatherStepData extends Data
+class WeatherStepData extends StepData
 {
     #[LiteralTypeScriptType('"http.weather.location"')]
-    public string $type = StepType::FetchWeatherForLocation->value;
+    public StepType $type = StepType::FetchWeatherForLocation;
     public function __construct(
         public readonly WeatherStepParams $params,
     ) {
 
     }
 }
-

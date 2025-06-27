@@ -2,9 +2,9 @@
 
 namespace App\Domain\Workflow\Steps\SendEmail;
 
-use Spatie\LaravelData\Data;
+use App\Data\StepDataParams;
 
-final class SendEmailStepParams extends Data
+final class SendEmailStepParams extends StepDataParams
 {
     public function __construct(
         public readonly string $to,

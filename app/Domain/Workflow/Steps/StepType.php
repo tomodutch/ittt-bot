@@ -2,8 +2,10 @@
 
 namespace App\Domain\Workflow\Steps;
 
+use App\Domain\Workflow\Steps\SendEmail\SendEmailStepData;
 use App\Domain\Workflow\Steps\SendEmail\SendEmailStepHandler;
 use App\Domain\Workflow\Steps\SendEmail\SendEmailStepParams;
+use App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepData;
 use App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepHandler;
 use App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepParams;
 use App\Domain\Workflow\Steps\Weather\WeatherStepData;
@@ -15,21 +17,12 @@ enum StepType: string
     case SendEmail = "notify.email.send";
     case SimpleConditional = "logic.conditional.simple";
 
-    public function handlerClass(): string
+    public function getDataClass(): string
     {
         return match ($this) {
             self::FetchWeatherForLocation => WeatherStepData::class,
-            self::SendEmail => SendEmailStepHandler::class,
-            self::SimpleConditional => SimpleConditionalStepHandler::class
-        };
-    }
-
-    public function getParamsClass(): string
-    {
-        return match ($this) {
-            self::FetchWeatherForLocation => WeatherStepParams::class,
-            self::SendEmail => SendEmailStepParams::class,
-            self::SimpleConditional => SimpleConditionalStepParams::class
+            self::SendEmail => SendEmailStepData::class,
+            self::SimpleConditional => SimpleConditionalStepData::class
         };
     }
 }

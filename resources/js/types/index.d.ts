@@ -1,6 +1,7 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 import "./generated";
+import * as Generated from "./generated";
 export interface Auth {
     user: User;
 }
@@ -42,13 +43,12 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
-export type Schedule = App.Data.ScheduleData;;
-export type ScheduleType = App.Enums.ScheduleType;
-export type Trigger = App.Data.TriggerData & {
-    steps: Step[]
-};
+export type Schedule = Generated.ScheduleData;;
+export type ScheduleType = Generated.ScheduleType;
+export type Trigger = Generated.TriggerData;
 
-export type SendEmailStep = App.Domain.Workflow.Steps.SendEmail.SendEmailStepData;
-export type SimpleConditionalStep = App.Domain.Workflow.Steps.SimpleConditional.SimpleConditionalStepData;
-export type FetchWeatherStep = App.Domain.Workflow.Steps.Weather.WeatherStepData;
-export type Step = SendEmailStep | SimpleConditionalStep | WeatherStep;
+export type StepType = Generated.StepType;
+export type SendEmailStep = Generated.SendEmailStepData;
+export type SimpleConditionalStep = Generated.SimpleConditionalStepData;
+export type FetchWeatherStep = Generated.WeatherStepData;
+export type Step = Generated.StepData;

@@ -2,25 +2,19 @@
 
 namespace App\Data;
 
-use App\Domain\Workflow\Steps\SendEmail\SendEmailStepParams;
-use App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepParams;
 use App\Domain\Workflow\Steps\StepType;
-use App\Domain\Workflow\Steps\Weather\WeatherStepParams;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScriptType;
 
+#[TypeScriptType('App\Domain\Workflow\Steps\SendEmail\SendEmailStepData | App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepData | App\Domain\Workflow\Steps\Weather\WeatherStepData')]
 class StepData extends Data
 {
-    public function __construct(
-        public ?string $id,
-        public ?string $triggerId,
-        public int $order,
-        public string $description,
-        public StepType $type,
-        public ?string $action = null,
-        public SendEmailStepParams|WeatherStepParams|SimpleConditionalStepParams $params,
-        public ?CarbonImmutable $createdAt,
-        public ?CarbonImmutable $updatedAt,
-    ) {
-    }
+    public ?string $id;
+    public ?string $triggerId;
+    public int $order;
+    public string $description;
+    public StepType $type;
+    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $updatedAt;
 }

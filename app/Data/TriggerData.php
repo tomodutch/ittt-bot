@@ -6,6 +6,7 @@ use App\Enums\ExecutionType;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 
 class TriggerData extends Data
@@ -18,6 +19,7 @@ class TriggerData extends Data
         #[DataCollectionOf(ScheduleData::class)]
         public Collection $schedules,
         #[DataCollectionOf(StepData::class)]
+        #[WithCast(StepDataPolymorphicCaster::class)]
         public Collection $steps,
         public ?CarbonImmutable $createdAt,
         public ?CarbonImmutable $updatedAt,

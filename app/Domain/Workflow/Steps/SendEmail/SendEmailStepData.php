@@ -2,14 +2,14 @@
 
 namespace App\Domain\Workflow\Steps\SendEmail;
 
+use App\Data\StepData;
 use App\Domain\Workflow\Steps\StepType;
-use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 
-final class SendEmailStepData extends Data
+final class SendEmailStepData extends StepData
 {
     #[LiteralTypeScriptType('"notify.email.send"')]
-    public string $type = StepType::SendEmail->value;
+    public StepType $type = StepType::SendEmail;
     public function __construct(
         public readonly SendEmailStepParams $params
     ) {

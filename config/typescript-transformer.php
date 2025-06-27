@@ -1,5 +1,6 @@
 <?php
 
+
 return [
     /*
      * The paths where typescript-transformer will look for PHP classes
@@ -61,7 +62,7 @@ return [
      * But you can also use the `ModuleWriter` or implement your own.
      */
 
-    'writer' => Spatie\TypeScriptTransformer\Writers\TypeDefinitionWriter::class,
+    'writer' => Spatie\TypeScriptTransformer\Writers\ModuleWriter::class,
 
     /*
      * The generated TypeScript file can be formatted. We ship a Prettier formatter

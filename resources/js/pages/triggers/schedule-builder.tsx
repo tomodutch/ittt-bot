@@ -78,9 +78,9 @@ export const ScheduleBuilder = ({ schedule, setSchedule }: Props) => {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="daily">Daily</SelectItem>
-                                <SelectItem value="weekly">Weekly</SelectItem>
-                                <SelectItem value="once">Once</SelectItem>
+                                <SelectItem value="Daily">Daily</SelectItem>
+                                <SelectItem value="Weekly">Weekly</SelectItem>
+                                <SelectItem value="Once">Once</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

@@ -25,13 +25,13 @@ function describeSchedule(schedule: Schedule) {
 
 function describeStep(step: Step) {
     switch (step.type) {
-        case 'fetchWeather':
+        case "http.weather.location":
             return `Fetch weather for "${step.params.location}"`;
-        case 'condition':
+        case 'logic.conditional.simple':
             const c = step.params;
             if (!c) return 'Condition (missing)';
             return `If ${c.left} ${c.operator} ${c.right}`;
-        case 'sendEmail':
+        case 'notify.email.send':
             return `Send email to "${step.params.to}" with subject "${step.params.subject}"`;
         default:
             return 'Unknown step';

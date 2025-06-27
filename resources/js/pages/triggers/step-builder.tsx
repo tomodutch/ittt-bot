@@ -29,11 +29,11 @@ export default function StepBuilder({ steps, setSteps }: Props) {
         };
 
         switch (step.type) {
-            case 'fetchWeather':
+            case 'http.weather.location':
                 return <FetchWeatherForm step={step} onChange={onChange} />;
-            case 'condition':
+            case 'logic.conditional.simple':
                 return <ConditionForm step={step} onChange={onChange} />;
-            case 'sendEmail':
+            case 'notify.email.send':
                 return <SendEmailForm step={step} onChange={onChange} />;
             default:
                 return <div>Unsupported step type</div>;
@@ -42,10 +42,14 @@ export default function StepBuilder({ steps, setSteps }: Props) {
 
     const addStep = () => {
         const newStep: Step = {
-            id: crypto.randomUUID(),
-            type: 'fetchWeather',
+            id: null,
+            triggerId: null,
+            order: steps.length + 1,
+            description: 'something',
+            type: 'http.weather.location',
             params: { location: '' },
-            exposedVariables: [{ name: 'temp', label: 'Temperature (C)' }]
+            createdAt: null,
+            updatedAt: null,
         };
         setSteps([...steps, newStep]);
     };

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Data\TriggerData;
+use App\Domain\Workflow\Steps\StepType;
 use App\Enums\ScheduleType;
 use App\Models\Trigger;
 use Illuminate\Http\Request;
@@ -41,9 +42,19 @@ class TriggerController extends Controller
                 $trigger->schedules()->create([
                     'type_code' => $s->typeCode,
                     'one_time_at' => $s->typeCode === ScheduleType::Once ? $s->oneTimeAt : null,
-                    'run_time' => $s->typeCode !== ScheduleType::Once ? $s->runTime : null,
+                    'time' => $s->typeCode !== ScheduleType::Once ? $s->time : null,
                     'days_of_week' => $s->typeCode === ScheduleType::Weekly ? $s->daysOfWeek ?? [] : null,
                     'timezone' => $s->timezone,
+                ]);
+            }
+
+            foreach ($triggerData->steps as $step) {
+                $trigger->steps()->create([
+                    'type' => $step->type,
+                    'name' => "test",
+                    "order" => $step->order,
+                    'description' => $step->description,
+                    "params" => $step->params
                 ]);
             }
 
