@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Schedule } from '@/types';
+import TimezoneSelect from './timezone-select';
 
 type Props = {
     schedule: Schedule;
@@ -95,10 +96,11 @@ export const ScheduleBuilder = ({ schedule, setSchedule }: Props) => {
                                     return (
                                         <label
                                             key={day}
-                                            className={`flex items-center gap-1 cursor-pointer select-none px-2 py-1 rounded-md border text-xs ${checked
+                                            className={`flex items-center gap-1 cursor-pointer select-none px-2 py-1 rounded-md border text-xs ${
+                                                checked
                                                     ? 'bg-primary text-white border-primary'
                                                     : 'bg-muted text-muted-foreground border-border'
-                                                }`}
+                                            }`}
                                             onClick={() => toggleDay(day)}
                                         >
                                             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day]}
@@ -133,6 +135,11 @@ export const ScheduleBuilder = ({ schedule, setSchedule }: Props) => {
                             />
                         </div>
                     )}
+
+                    <TimezoneSelect
+                        timezone={schedule.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone}
+                        setTimezone={(tz) => setSchedule({ ...schedule, timezone: tz })}
+                    />
                 </div>
             )}
         </div>

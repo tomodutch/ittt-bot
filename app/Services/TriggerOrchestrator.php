@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\ExecutionStatus;
 use App\Enums\RunReason;
+use App\Jobs\RunTriggerExecution;
 use App\Models\Schedule;
 use App\Models\TriggerExecution;
 use Illuminate\Support\Collection;
@@ -18,6 +19,7 @@ class TriggerOrchestrator
      * @param \Illuminate\Support\Collection<int, \App\Models\Schedule> $schedules
      * @return void
      */
+
     public function process(Collection $schedules)
     {
         $now = now("UTC");
@@ -49,7 +51,7 @@ class TriggerOrchestrator
                 'context' => json_encode($model->context),
                 'created_at' => $now,
                 'updated_at' => $now,
-                '_schedule_ids' => $schedules->pluck('id'),  // keep schedule IDs for pivot
+                '_schedule_ids' => $schedules->pluck('id'),
             ];
         });
 
@@ -68,5 +70,10 @@ class TriggerOrchestrator
 
         Log::debug("Insert into pivot table");
         DB::table('schedule_trigger_execution')->insert($pivotData->toArray());
+
+        foreach ($triggerExecutionsData as $data) {
+            RunTriggerExecution::dispatchSync($data['id']);
+            Log::info("Dispatched RunTriggerExecution job for trigger_execution_id: {$data['id']}");
+        }
     }
 }

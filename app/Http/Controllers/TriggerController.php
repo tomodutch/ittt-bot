@@ -6,6 +6,7 @@ use App\Data\TriggerData;
 use App\Domain\Workflow\Steps\StepType;
 use App\Enums\ScheduleType;
 use App\Models\Trigger;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -39,12 +40,18 @@ class TriggerController extends Controller
             ]);
 
             foreach ($triggerData->schedules as $s) {
+                $timezone = $s->timezone ?? 'UTC';
+
                 $trigger->schedules()->create([
                     'type_code' => $s->typeCode,
-                    'one_time_at' => $s->typeCode === ScheduleType::Once ? $s->oneTimeAt : null,
-                    'time' => $s->typeCode !== ScheduleType::Once ? $s->time : null,
+                    'one_time_at' => $s->typeCode === ScheduleType::Once && $s->oneTimeAt
+                        ? Carbon::parse($s->oneTimeAt, $timezone)->utc()
+                        : null,
+                    'time' => $s->typeCode !== ScheduleType::Once && $s->time
+                        ? Carbon::parse($s->time, $timezone)->utc()->format('H:i')
+                        : null,
                     'days_of_week' => $s->typeCode === ScheduleType::Weekly ? $s->daysOfWeek ?? [] : null,
-                    'timezone' => $s->timezone,
+                    'timezone' => $timezone,
                 ]);
             }
 

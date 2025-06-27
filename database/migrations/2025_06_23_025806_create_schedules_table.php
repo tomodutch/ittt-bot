@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignUuid("trigger_id")->constrained("triggers")->cascadeOnDelete();
             $table->string("type_code", 55);
             $table->dateTimeTz("one_time_at")->nullable();
-            $table->timeTz("time")->nullable();
+            // Dont store the timezone in the time column, just store the time in UTC
+            $table->time("time")->nullable();
             $table->json("days_of_the_week")->nullable();
             $table->string("timezone", 100);
             $table->timestampsTz();

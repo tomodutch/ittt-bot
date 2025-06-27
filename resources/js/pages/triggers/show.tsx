@@ -6,21 +6,72 @@ import { type SharedData, type Trigger, type Step, type Schedule } from '@/types
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 function describeSchedule(schedule: Schedule) {
-    const { typeCode, time: runTime, oneTimeAt, daysOfTheWeek: daysOfWeek } = schedule;
-    switch (typeCode) {
-        case "Once":
-            return `Once at ${new Date(oneTimeAt ?? '').toLocaleString()}`;
-        case "Daily":
-            return `Every day at ${runTime}`;
-        case "Weekly":
-            const days =
-                (daysOfWeek?.length ?? 0) > 0
-                    ? daysOfWeek!.map((d) => WEEKDAYS[d]).join(', ')
-                    : '[no days selected]';
-            return `Every week on ${days} at ${runTime}`;
-        default:
-            return 'Unknown schedule';
+  const { typeCode, time: runTime, oneTimeAt, daysOfTheWeek: daysOfWeek, timezone } = schedule;
+
+  // fallback timezone
+  const tz = timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  switch (typeCode) {
+    case "Once": {
+      if (!oneTimeAt) return 'Once at [no date/time set]';
+      const date = new Date(oneTimeAt);
+      const formatted = new Intl.DateTimeFormat(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: tz,
+      }).format(date);
+      return `Once at ${formatted} (${tz})`;
     }
+    case "Daily": {
+      if (!runTime) return 'Every day at [no time set]';
+      // Parse runTime like "14:30" as today’s date + time in tz, then format
+      const [hours, minutes] = runTime.split(':').map(Number);
+      const now = new Date();
+      // Create a date in tz at today's date and runTime
+      const dateInTz = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        hours,
+        minutes
+      ));
+      // Format time only, with tz info
+      const formatted = new Intl.DateTimeFormat(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: tz,
+        timeZoneName: 'short',
+      }).format(dateInTz);
+      return `Every day at ${formatted}`;
+    }
+    case "Weekly": {
+      if (!runTime) return 'Every week at [no time set]';
+      const days =
+        (daysOfWeek?.length ?? 0) > 0
+          ? daysOfWeek!.map((d) => WEEKDAYS[d]).join(', ')
+          : '[no days selected]';
+
+      const [hours, minutes] = runTime.split(':').map(Number);
+      const now = new Date();
+      const dateInTz = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        hours,
+        minutes
+      ));
+      const formatted = new Intl.DateTimeFormat(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: tz,
+        timeZoneName: 'short',
+      }).format(dateInTz);
+
+      return `Every week on ${days} at ${formatted}`;
+    }
+    default:
+      return 'Unknown schedule';
+  }
 }
 
 function describeStep(step: Step) {

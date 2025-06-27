@@ -23,7 +23,7 @@ export default function CreateTriggerPage() {
         time: '10:00',
         daysOfTheWeek: [],
         oneTimeAt: '',
-        timezone: 'UTC',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         createdAt: null,
         updatedAt: null,
     });

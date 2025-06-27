@@ -11,7 +11,7 @@ class StepHandlerResolver implements StepHandlerResolverContract
 {
     public function resolve(Step $step): StepHandlerContract
     {
-        $handlerClass = $step->type->handlerClass();
+        $handlerClass = $step->type->getHandlerClass();
         // create an instance of the step handler
         return app($handlerClass);
     }
