@@ -47,6 +47,7 @@ export type Schedule = Generated.ScheduleData;;
 export type ScheduleType = Generated.ScheduleType;
 export type Trigger = Generated.TriggerData;
 export type TriggerExecution = Generated.TriggerExecutionData;
+export type Operator = Generated.Operator;
 
 export type StepType = Generated.StepType;
 export type SendEmailStep = Generated.SendEmailStepData;

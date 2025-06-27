@@ -16,7 +16,9 @@ final class SimpleConditionalStepHandler implements StepHandlerContract
 		$params = SimpleConditionalStepParams::from($context->getParams());
         $leftValue = $context->getVariable($params->left);
         $rightValue = $params->right;
-        $operator = $params->operator; // This is now Operator enum
+        $operator = $params->operator;
+
+        $builder->info("Evaluating condition: \"{$leftValue}\" {$operator->value} {$params->right}");
 
         $result = match ($operator) {
             Operator::EQ => $leftValue == $rightValue,
@@ -47,9 +49,14 @@ final class SimpleConditionalStepHandler implements StepHandlerContract
             // You could throw here or handle default case if all enum cases are covered
         };
 
+
         if ($result) {
+            $builder->info("Condition evaluated to true: {$leftValue} {$operator->value} {$params->right}");
+            $builder->info("Continuing workflow execution");
             $builder->setDirective(new ContinueDirective());
         } else {
+            $builder->info("Condition evaluated to false: {$leftValue} {$operator->value} {$params->right}");
+            $builder->info("Aborting workflow execution");
             $builder->setDirective(new AbortDirective());
         }
     }

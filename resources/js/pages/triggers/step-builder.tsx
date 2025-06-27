@@ -6,20 +6,21 @@ import {
     FetchWeatherForm,
     SendEmailForm
 } from './step-components';
-import { Step } from '@/types';
+import { FetchWeatherStep, SendEmailStep, SimpleConditionalStep, Step } from '@/types';
 
-type Props = {
-    steps: Step[];
-    setSteps: (steps: Step[]) => void;
-};
+const STEP_TYPES = [
+    { value: 'http.weather.location', label: 'Fetch Weather' },
+    { value: 'logic.conditional.simple', label: 'Simple Condition' },
+    { value: 'notify.email.send', label: 'Send Email' },
+];
 
-export default function StepBuilder({ steps, setSteps }: Props) {
+export default function StepBuilder({ steps, setSteps }: { steps: Step[]; setSteps: (steps: Step[]) => void }) {
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+    const [newStepType, setNewStepType] = useState<string>(STEP_TYPES[0].value);
 
     const toggleExpanded = (index: number) => {
         setExpandedIndex(expandedIndex === index ? null : index);
     };
-
 
     const renderStepForm = (step: Step, index: number) => {
         const onChange = (newParams: any) => {
@@ -40,18 +41,64 @@ export default function StepBuilder({ steps, setSteps }: Props) {
         }
     };
 
-    const addStep = () => {
-        const newStep: Step = {
+    function addWeatherStep(): FetchWeatherStep {
+        return {
             id: null,
             triggerId: null,
             order: steps.length + 1,
-            description: 'something',
-            type: 'http.weather.location',
+            description: 'Fetch weather',
+            type: "http.weather.location",
             params: { location: '' },
             createdAt: null,
             updatedAt: null,
         };
-        setSteps([...steps, newStep]);
+    }
+
+    function addSimpleConditionStep(): SimpleConditionalStep {
+        return {
+            id: null,
+            triggerId: null,
+            order: steps.length + 1,
+            description: 'Simple condition',
+            type: "logic.conditional.simple",
+            params: { left: '', operator: '==', right: '' },
+            createdAt: null,
+            updatedAt: null,
+        };
+    }
+
+    function addEmailStep(): SendEmailStep {
+        return {
+            id: null,
+            triggerId: null,
+            order: steps.length + 1,
+            description: 'Send email',
+            type: "notify.email.send",
+            params: { to: '', subject: '', body: '', cc: null, bcc: null },
+            createdAt: null,
+            updatedAt: null,
+        };
+    }
+
+    function getNewStep() {
+        switch (newStepType) {
+            case 'http.weather.location':
+                return addWeatherStep();
+            case 'logic.conditional.simple':
+                return addSimpleConditionStep();
+            case 'notify.email.send':
+                return addEmailStep();
+            default:
+                console.warn(`Unsupported step type: ${newStepType}`);
+                break;
+        }
+    }
+
+    const addStep = () => {
+        const newStep = getNewStep();
+        if (newStep) {
+            setSteps([...steps, newStep]);
+        }
     };
 
     return (
@@ -59,13 +106,13 @@ export default function StepBuilder({ steps, setSteps }: Props) {
             {steps.map((step, i) => {
                 const isExpanded = expandedIndex === i;
                 return (
-                    <div key={step.id} className="border rounded-md bg-background p-4">
+                    <div key={i} className="border rounded-md bg-background p-4">
                         <div className="flex items-center justify-between">
                             <div
                                 className="font-medium cursor-pointer flex-1"
                                 onClick={() => toggleExpanded(i)}
                             >
-                                {step.type} step
+                                {step.type}
                             </div>
 
                             <Button
@@ -97,15 +144,24 @@ export default function StepBuilder({ steps, setSteps }: Props) {
                 );
             })}
 
-            <Button
-                type="button"
-                variant="outline"
-                onClick={addStep}
-                className="flex items-center w-full justify-center"
-            >
-                <Plus className="mr-2 h-5 w-5" />
-                Add Step
-            </Button>
+            <div className="flex gap-4">
+                <select
+                    className="border px-3 py-2 rounded-md"
+                    value={newStepType}
+                    onChange={(e) => setNewStepType(e.target.value)}
+                >
+                    {STEP_TYPES.map((type) => (
+                        <option key={type.value} value={type.value}>
+                            {type.label}
+                        </option>
+                    ))}
+                </select>
+
+                <Button type="button" variant="outline" onClick={addStep} className="flex items-center gap-2">
+                    <Plus className="h-5 w-5" />
+                    Add Step
+                </Button>
+            </div>
         </div>
     );
 }

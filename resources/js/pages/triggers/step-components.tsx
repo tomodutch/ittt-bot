@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { SimpleConditionalStep, FetchWeatherStep, SendEmailStep } from '@/types';
+import { SimpleConditionalStep, FetchWeatherStep, SendEmailStep, Operator } from '@/types';
 
 export function FetchWeatherForm({ step, onChange }: {
     step: FetchWeatherStep,
@@ -23,28 +23,29 @@ export function FetchWeatherForm({ step, onChange }: {
 
 export function ConditionForm({ step, onChange }: {
     step: SimpleConditionalStep,
-    onChange: (key: keyof SimpleConditionalStep['params'], value: any) => void
+    onChange: (newParams: Partial<SimpleConditionalStep['params']>) => void;
 }) {
-    const OPERATORS = ['==', '!=', '<', '>'];
+    const OPERATORS: Operator[] = ['==', '!=', '<', '>'];
     const cond = step.params;
 
     return (
         <div className="flex flex-wrap gap-2 items-center">
-            <Select
+            <Input
                 value={cond.left}
-                onValueChange={(val) => onChange('left', val)}
-            >
-                <SelectTrigger><SelectValue placeholder="Variable" /></SelectTrigger>
-                <SelectContent>
-                    {/* {step.exposedVariables?.map((v) => (
-                        <SelectItem key={v.name} value={v.name}>{v.label}</SelectItem>
-                    ))} */}
-                </SelectContent>
-            </Select>
+                onChange={(e) => onChange({ ...cond, left: e.target.value })}
+                placeholder="Value"
+                className="min-w-[100px]"
+            />
 
             <Select
                 value={cond.operator}
-                onValueChange={(val) => onChange('operator', val)}
+                onValueChange={(val) => {
+                    if (!val) {
+                        return;
+                    }
+
+                    onChange({ ...cond, operator: val as Operator });
+                }}
             >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -56,7 +57,7 @@ export function ConditionForm({ step, onChange }: {
 
             <Input
                 value={cond.right}
-                onChange={(e) => onChange('right', e.target.value)}
+                onChange={(e) => onChange({ ...cond, right: e.target.value })}
                 placeholder="Value"
                 className="min-w-[100px]"
             />
@@ -66,22 +67,22 @@ export function ConditionForm({ step, onChange }: {
 
 export function SendEmailForm({ step, onChange }: {
     step: SendEmailStep,
-    onChange: (key: keyof SendEmailStep['params'], value: any) => void
+    onChange: (newParams: Partial<SendEmailStep['params']>) => void;
 }) {
     const p = step.params;
     return (
         <div className="space-y-4">
             <div className="grid gap-2">
                 <Label>To</Label>
-                <Input value={p.to} onChange={(e) => onChange('to', e.target.value)} />
+                <Input value={p.to} onChange={(e) => onChange({ ...p, to: e.target.value })} />
             </div>
             <div className="grid gap-2">
                 <Label>Subject</Label>
-                <Input value={p.subject} onChange={(e) => onChange('subject', e.target.value)} />
+                <Input value={p.subject} onChange={(e) => onChange({ ...p, subject: e.target.value })} />
             </div>
             <div className="grid gap-2">
                 <Label>Body</Label>
-                <Textarea value={p.body} onChange={(e) => onChange('body', e.target.value)} />
+                <Textarea value={p.body} onChange={(e) => onChange({ ...p, body: e.target.value })} />
             </div>
         </div>
     );
