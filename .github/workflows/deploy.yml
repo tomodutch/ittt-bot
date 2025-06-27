@@ -172,7 +172,7 @@ jobs:
 
       - name: create override file
         run : |
-            cat <<EOF > docker-compose.override.yml
+            cat <<EOF > docker-compose.override.yaml
             services:
               web:
                 image: ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }}
@@ -180,10 +180,10 @@ jobs:
                 image: ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }}
             EOF
       - name: Start containers using pulled image
-        run: docker compose --env-file .env -f compose.prod.yml -f docker-compose.override.yml up -d --remove-orphans --force-recreate
+        run: docker compose --env-file .env -f compose.prod.yaml -f docker-compose.override.yaml up -d --remove-orphans --force-recreate
 
       - name: Run migrations
-        run: docker compose --env-file .env -f compose.prod.yml -f docker-compose.override.yml exec php-fpm php artisan migrate --no-interaction --force
+        run: docker compose --env-file .env -f compose.prod.yaml- f docker-compose.override.yaml exec php-fpm php artisan migrate --no-interaction --force
 
       - name: Clean up unused Docker resources
         run: docker system prune -af
