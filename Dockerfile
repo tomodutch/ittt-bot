@@ -71,7 +71,7 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/laravel-cron /etc/periodic/1min/laravel-cron
 RUN chmod +x /etc/periodic/1min/laravel-cron
 
-USER www
+USER root
 
 EXPOSE 9000
 
