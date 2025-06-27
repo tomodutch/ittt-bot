@@ -41,7 +41,7 @@ jobs:
             --tag ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }} \
             -f docker/production/nginx/Dockerfile .
 
-      - name: Clean up old Docker images (Retention: keep latest 5)
+      - name: "Clean up old Docker images (Retention: keep latest 5)"
         env:
           GH_TOKEN: ${{ secrets.GHCR_PAT }}
         run: |
