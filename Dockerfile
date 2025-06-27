@@ -33,7 +33,7 @@ RUN apk add --no-cache \
     unzip \
     shadow \
     supervisor \
-    cron \
+    dcron \
     tzdata
 
 ENV TZ=Asia/Tokyo
