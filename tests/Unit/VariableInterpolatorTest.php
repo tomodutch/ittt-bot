@@ -3,13 +3,12 @@
 namespace Tests\Unit;
 
 use App\Support\VariableInterpolator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class VariableInterpolatorTest extends TestCase
 {
-    /**
-     * @dataProvider interpolationCases
-     */
+    #[DataProvider('interpolationCases')]
     public function test_interpolation(string $template, array $context, string $expected)
     {
         $result = VariableInterpolator::interpolate($template, $context);
