@@ -40,10 +40,11 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y unzip git zip curl \
  && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-COPY composer.json composer.lock ./
+# Copy entire app so artisan exists
+COPY . .
 
-RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
- && composer dump-autoload --optimize
+# Run composer install
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
 # ----------------------
 # Stage 3: Final app image
