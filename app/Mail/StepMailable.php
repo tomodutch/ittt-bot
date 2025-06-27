@@ -15,8 +15,7 @@ class StepMailable extends Mailable
     public function __construct(
         public readonly string $customSubject,
         public readonly string $body
-    ) {
-    }
+    ) {}
 
     /**
      * Get the message envelope.

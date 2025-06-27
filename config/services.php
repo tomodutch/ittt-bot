@@ -28,8 +28,8 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
-    "brevo" => [
-        "key" => env("BREVO_KEY")
+    'brevo' => [
+        'key' => env('BREVO_KEY'),
     ],
 
     'slack' => [

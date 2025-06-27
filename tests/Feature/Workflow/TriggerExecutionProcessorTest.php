@@ -5,10 +5,10 @@ namespace Tests\Feature\Services;
 use App\Contracts\WeatherFetcherContract;
 use App\Domain\Workflow\StepHandlerResolver;
 use App\Domain\Workflow\StepProcessor;
+use App\Domain\Workflow\TriggerExecutionProcessor;
 use App\Enums\ExecutionStatus;
 use App\Models\Trigger;
 use App\Models\TriggerExecution;
-use App\Domain\Workflow\TriggerExecutionProcessor;
 use Database\Factories\WorkflowFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -21,9 +21,9 @@ class TriggerExecutionProcessorTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    public function testEmpty()
+    public function test_empty()
     {
-        $stepHandlerResolver = new StepHandlerResolver();
+        $stepHandlerResolver = new StepHandlerResolver;
         $stepProcessor = new StepProcessor($stepHandlerResolver);
         $execution = TriggerExecution::factory()->idle()->create();
         $trigger = $execution->trigger;
@@ -33,15 +33,15 @@ class TriggerExecutionProcessorTest extends TestCase
         $this->assertEquals(ExecutionStatus::Finished, $execution->status_code);
     }
 
-    public function testFetchWeather()
+    public function test_fetch_weather()
     {
         $this->app->bind(WeatherFetcherContract::class, function () {
             return new InMemoryWeatherFetcher([
-                "London" => WeatherFactory::getLondonWeather()
+                'London' => WeatherFactory::getLondonWeather(),
             ]);
         });
-        
-        $stepHandlerResolver = new StepHandlerResolver();
+
+        $stepHandlerResolver = new StepHandlerResolver;
         $stepProcessor = new StepProcessor($stepHandlerResolver);
         $execution = TriggerExecution::factory()->has(Trigger::factory())->create();
         $execution->trigger->steps()->saveMany(WorkflowFactory::createWeatherWorkflow());

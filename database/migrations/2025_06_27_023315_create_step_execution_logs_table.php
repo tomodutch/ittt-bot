@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('step_execution_logs', function (Blueprint $table) {
-            $table->uuid("id")->primary();
-            $table->foreignUuid("trigger_execution_id")->constrained('trigger_executions')->cascadeOnDelete();
-            $table->foreignUuid("step_id")->constrained('steps')->cascadeOnDelete();
-            $table->string("level");
-            $table->string("message");
-            $table->json("details")->nullable();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('trigger_execution_id')->constrained('trigger_executions')->cascadeOnDelete();
+            $table->foreignUuid('step_id')->constrained('steps')->cascadeOnDelete();
+            $table->string('level');
+            $table->string('message');
+            $table->json('details')->nullable();
             $table->timestampsTz();
             $table->softDeletesTz();
         });

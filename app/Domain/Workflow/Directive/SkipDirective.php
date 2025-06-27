@@ -2,7 +2,4 @@
 
 namespace App\Domain\Workflow\Directive;
 
-final class SkipDirective extends FlowDirective
-{
-
-}
+final class SkipDirective extends FlowDirective {}

@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Enums\ScheduleType;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Trigger;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Schedule>
@@ -20,13 +20,13 @@ class ScheduleFactory extends Factory
             'one_time_at' => null,
             'time' => $this->faker->time('H:i:s'),
             'days_of_the_week' => null,
-            "timezone" => "UTC"
+            'timezone' => 'UTC',
         ];
     }
 
     public function once(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'type_code' => ScheduleType::Once,
             'one_time_at' => $this->faker->dateTimeBetween('+1 hour', '+3 days'),
             'time' => null,
@@ -36,7 +36,7 @@ class ScheduleFactory extends Factory
 
     public function daily(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'type_code' => ScheduleType::Daily,
             'one_time_at' => null,
             'time' => $this->faker->time('H:i:s'),
@@ -46,7 +46,7 @@ class ScheduleFactory extends Factory
 
     public function weekly(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'type_code' => ScheduleType::Weekly,
             'one_time_at' => null,
             'time' => $this->faker->time('H:i:s'),

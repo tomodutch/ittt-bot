@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Integrations\WeatherAPI\DataTransferObjects;
 
 class WeatherCondition

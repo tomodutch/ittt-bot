@@ -10,9 +10,8 @@ class WeatherStepData extends StepData
 {
     #[LiteralTypeScriptType('"http.weather.location"')]
     public StepType $type = StepType::FetchWeatherForLocation;
+
     public function __construct(
         public readonly WeatherStepParams $params,
-    ) {
-
-    }
+    ) {}
 }

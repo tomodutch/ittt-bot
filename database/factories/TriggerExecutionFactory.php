@@ -3,9 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\ExecutionStatus;
-use App\Enums\ExecutionType;
 use App\Enums\RunReason;
-use App\Models\Schedule;
 use App\Models\Trigger;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,18 +20,19 @@ class TriggerExecutionFactory extends Factory
     public function definition(): array
     {
         return [
-            "trigger_id" => Trigger::factory(),
-            "origin_type" => "SYSTEM",
-            "origin_id" => $this->faker->uuid(),
-            "status_code" => ExecutionStatus::Idle,
-            "run_reason_code" => RunReason::Scheduled,
-            "context" => []
+            'trigger_id' => Trigger::factory(),
+            'origin_type' => 'SYSTEM',
+            'origin_id' => $this->faker->uuid(),
+            'status_code' => ExecutionStatus::Idle,
+            'run_reason_code' => RunReason::Scheduled,
+            'context' => [],
         ];
     }
 
-    public function idle(): TriggerExecutionFactory   {
-        return $this->state(fn() => [
-            "status_code" => ExecutionStatus::Idle
+    public function idle(): TriggerExecutionFactory
+    {
+        return $this->state(fn () => [
+            'status_code' => ExecutionStatus::Idle,
         ]);
     }
 }

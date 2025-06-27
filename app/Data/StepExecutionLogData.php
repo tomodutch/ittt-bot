@@ -14,6 +14,5 @@ class StepExecutionLogData extends Data
         public LogLevel $level,
         public string $message,
         public ?array $details = null
-    ) {
-    }
+    ) {}
 }

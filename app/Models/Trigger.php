@@ -12,19 +12,20 @@ class Trigger extends Model
 {
     /** @use HasFactory<\Database\Factories\TriggerFactory> */
     use HasFactory;
+
     use HasUuids;
     use SoftDeletes;
 
     protected $fillable = [
-        "id",
-        "user_id",
-        "name",
-        "description",
-        "execution_type",
+        'id',
+        'user_id',
+        'name',
+        'description',
+        'execution_type',
     ];
 
     protected $casts = [
-        "execution_type" => ExecutionType::class
+        'execution_type' => ExecutionType::class,
     ];
 
     public function user()

@@ -11,13 +11,12 @@ use App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepParams;
 use App\Domain\Workflow\Steps\Weather\WeatherStepData;
 use App\Domain\Workflow\Steps\Weather\WeatherStepHandler;
 use App\Domain\Workflow\Steps\Weather\WeatherStepParams;
-use App\Models\Step;
 
 enum StepType: string
 {
-    case FetchWeatherForLocation = "http.weather.location";
-    case SendEmail = "notify.email.send";
-    case SimpleConditional = "logic.conditional.simple";
+    case FetchWeatherForLocation = 'http.weather.location';
+    case SendEmail = 'notify.email.send';
+    case SimpleConditional = 'logic.conditional.simple';
 
     public function getDataClass(): string
     {
@@ -29,6 +28,7 @@ enum StepType: string
         return $this->getConfig()->handlerClass;
 
     }
+
     public function getParamsClass(): string
     {
         return $this->getConfig()->paramsClass;
@@ -62,6 +62,5 @@ class StepConfig
         public readonly string $dataClass,
         public readonly string $paramsClass,
         public readonly string $handlerClass,
-    ) {
-    }
+    ) {}
 }

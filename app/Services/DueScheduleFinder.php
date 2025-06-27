@@ -4,27 +4,27 @@ namespace App\Services;
 
 use App\Enums\ScheduleType;
 use App\Models\Schedule;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class DueScheduleFinder
 {
     public function find(): Collection
     {
         $nowUtc = Carbon::now('UTC');
-        Log::info("Finding due schedules");
+        Log::info('Finding due schedules');
 
         // Load schedules with latest execution to minimize queries
         $schedules = Schedule::with(['triggerExecutions' => function ($query) {
             $query->orderByDesc('trigger_executions.created_at')->limit(1);
         }])
-        ->whereIn('type_code', [ScheduleType::Once, ScheduleType::Daily, ScheduleType::Weekly])
-        ->get();
+            ->whereIn('type_code', [ScheduleType::Once, ScheduleType::Daily, ScheduleType::Weekly])
+            ->get();
 
         $due = $schedules->filter(fn ($schedule) => $this->isScheduleDue($schedule, $nowUtc));
 
-        Log::info("Done finding due schedules", [
+        Log::info('Done finding due schedules', [
             'total' => $due->count(),
             'once' => $due->where('type_code', ScheduleType::Once)->count(),
             'daily' => $due->where('type_code', ScheduleType::Daily)->count(),
@@ -56,7 +56,7 @@ class DueScheduleFinder
 
     protected function isOnceScheduleDue(Schedule $schedule, Carbon $nowUtc, ?Carbon $lastExecutedAt): bool
     {
-        if (!$schedule->one_time_at) {
+        if (! $schedule->one_time_at) {
             return false;
         }
 
@@ -68,7 +68,7 @@ class DueScheduleFinder
 
     protected function isDailyScheduleDue(Schedule $schedule, Carbon $nowUtc, ?Carbon $lastExecutedAt): bool
     {
-        if (!$schedule->time || !$schedule->timezone) {
+        if (! $schedule->time || ! $schedule->timezone) {
             return false;
         }
 
@@ -85,7 +85,7 @@ class DueScheduleFinder
             return false;
         }
 
-        if (!$lastExecutedAt) {
+        if (! $lastExecutedAt) {
             return true;
         }
 
@@ -102,7 +102,7 @@ class DueScheduleFinder
 
     protected function isWeeklyScheduleDue(Schedule $schedule, Carbon $nowUtc, ?Carbon $lastExecutedAt): bool
     {
-        if (!$schedule->time || !$schedule->timezone || empty($schedule->days_of_the_week)) {
+        if (! $schedule->time || ! $schedule->timezone || empty($schedule->days_of_the_week)) {
             return false;
         }
 
@@ -112,12 +112,12 @@ class DueScheduleFinder
         $nowLocal = $nowUtc->copy()->setTimezone($schedule->timezone);
 
         // Convert days 0=Sun..6=Sat to ISO (1=Mon..7=Sun) for easier comparison
-        $scheduledDaysIso = array_map(fn($d) => $d === 0 ? 7 : $d, $schedule->days_of_the_week);
+        $scheduledDaysIso = array_map(fn ($d) => $d === 0 ? 7 : $d, $schedule->days_of_the_week);
 
         $todayIso = $nowLocal->dayOfWeekIso; // 1=Mon..7=Sun
 
         // If today is not a scheduled day, not due
-        if (!in_array($todayIso, $scheduledDaysIso, true)) {
+        if (! in_array($todayIso, $scheduledDaysIso, true)) {
             return false;
         }
 
@@ -129,7 +129,7 @@ class DueScheduleFinder
             return false;
         }
 
-        if (!$lastExecutedAt) {
+        if (! $lastExecutedAt) {
             return true;
         }
 

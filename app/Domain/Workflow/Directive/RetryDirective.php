@@ -2,7 +2,4 @@
 
 namespace App\Domain\Workflow\Directive;
 
-final class RetryDirective extends FlowDirective
-{
-
-}
+final class RetryDirective extends FlowDirective {}

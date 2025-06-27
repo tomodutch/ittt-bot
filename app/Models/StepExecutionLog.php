@@ -12,20 +12,21 @@ class StepExecutionLog extends Model
 {
     /** @use HasFactory<\Database\Factories\StepExecutionLogFactory> */
     use HasFactory;
+
     use HasUuids;
     use SoftDeletes;
 
     protected $fillable = [
-        "id",
-        "trigger_execution_id",
-        "step_id",
-        "level",
-        "message",
-        "details"
+        'id',
+        'trigger_execution_id',
+        'step_id',
+        'level',
+        'message',
+        'details',
     ];
 
     protected $casts = [
-        "level" => LogLevel::class,
+        'level' => LogLevel::class,
         'details' => 'array',
     ];
 }

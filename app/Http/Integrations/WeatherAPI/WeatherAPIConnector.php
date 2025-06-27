@@ -11,19 +11,15 @@ class WeatherAPIConnector extends Connector
     use AcceptsJson;
     use HasTimeout;
 
-    public function __construct(private string $baseUri) {
-
-    }
+    public function __construct(private string $baseUri) {}
 
     /**
      * Connect timeout of 5 seconds
-     * @var int
      */
     protected int $connectTimeout = 5;
 
     /**
      * Request timeout of 15 seconds
-     * @var int
      */
     protected int $requestTimeout = 15;
 

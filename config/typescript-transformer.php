@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     /*
      * The paths where typescript-transformer will look for PHP classes

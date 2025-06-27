@@ -3,14 +3,13 @@
 namespace Tests\Feature\Workflow\Steps;
 
 use App\Domain\Workflow\StepExecutionContext;
-use Illuminate\Support\Collection;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\TestCase;
 
 class StepExecutionContextTest extends TestCase
 {
     #[DataProvider('getVariableProvider')]
-    public function testGetVariable(array $variables, string $key, mixed $expected): void
+    public function test_get_variable(array $variables, string $key, mixed $expected): void
     {
         $context = new StepExecutionContext(collect($variables));
         $this->assertSame($expected, $context->getVariable($key));
@@ -43,7 +42,7 @@ class StepExecutionContextTest extends TestCase
     }
 
     #[DataProvider('hasVariableProvider')]
-    public function testHasVariable(array $variables, string $key, bool $expected): void
+    public function test_has_variable(array $variables, string $key, bool $expected): void
     {
         $context = new StepExecutionContext(collect($variables));
         $this->assertSame($expected, $context->hasVariable($key));
@@ -75,7 +74,7 @@ class StepExecutionContextTest extends TestCase
         ];
     }
 
-    public function testMergeCreatesNewContextAndMergesVariables(): void
+    public function test_merge_creates_new_context_and_merges_variables(): void
     {
         $variables = [
             'foo' => ['bar' => 1, 'baz' => 2],
@@ -98,7 +97,7 @@ class StepExecutionContextTest extends TestCase
         $this->assertSame('newValue', $mergedContext->getVariable('added'));
     }
 
-    public function testWithParamsReturnsNewContextWithUpdatedParams(): void
+    public function test_with_params_returns_new_context_with_updated_params(): void
     {
         $variables = ['key' => 'value'];
         $params = ['param1' => 'value1'];

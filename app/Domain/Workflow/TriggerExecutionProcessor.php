@@ -2,7 +2,6 @@
 
 namespace App\Domain\Workflow;
 
-use App\Data\StepExecutionLogData;
 use App\Domain\Workflow\Contracts\StepProcessorContract;
 use App\Domain\Workflow\Directive\AbortDirective;
 use App\Domain\Workflow\Directive\ContinueDirective;
@@ -16,22 +15,19 @@ use Illuminate\Support\Collection;
 
 class TriggerExecutionProcessor
 {
-    public function __construct(private StepProcessorContract $stepProcessor)
-    {
-
-    }
+    public function __construct(private StepProcessorContract $stepProcessor) {}
 
     public function process(TriggerExecution $triggerExecution)
     {
         $triggerExecution->status_code = ExecutionStatus::Running;
         $triggerExecution->save();
 
-        $context = new StepExecutionContext(new Collection());
-        $steps = $triggerExecution->trigger->steps()->orderBy("order")->get();
+        $context = new StepExecutionContext(new Collection);
+        $steps = $triggerExecution->trigger->steps()->orderBy('order')->get();
         $currentIndex = 0;
         $doAbort = false;
         $maxLoops = 100;
-        while ($currentIndex < $maxLoops && !$doAbort && isset($steps[$currentIndex])) {
+        while ($currentIndex < $maxLoops && ! $doAbort && isset($steps[$currentIndex])) {
             $step = $steps[$currentIndex];
             $result = $this->stepProcessor->process($step, $context);
             $logs = $result->getLogs();
@@ -43,7 +39,7 @@ class TriggerExecutionProcessor
                         'step_id' => $step->id,
                         'level' => $log['level'],
                         'message' => $log['message'],
-                        'details' => $log['context'] ?? []
+                        'details' => $log['context'] ?? [],
                     ]);
                 })
             );
@@ -69,7 +65,7 @@ class TriggerExecutionProcessor
                     break;
 
                 default:
-                    throw new \LogicException("Unknown flow directive");
+                    throw new \LogicException('Unknown flow directive');
             }
         }
 

@@ -9,5 +9,4 @@ use App\Models\Step;
 interface StepProcessorContract
 {
     public function process(Step $step, StepExecutionContext $context): StepResult;
-
 }

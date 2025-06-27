@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
-class RunTriggerExecution implements ShouldQueue, ShouldBeUnique
+class RunTriggerExecution implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
@@ -27,8 +27,9 @@ class RunTriggerExecution implements ShouldQueue, ShouldBeUnique
     public function handle(TriggerExecutionProcessor $processor): void
     {
         $execution = TriggerExecution::find($this->id);
-        if (!$execution) {
+        if (! $execution) {
             Log::info("Trigger execution with ID {$this->id} not found.");
+
             return;
         }
 

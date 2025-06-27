@@ -20,12 +20,12 @@ class StepExecutionLogFactory extends Factory
     public function definition(): array
     {
         return [
-            "id" => $this->faker->uuid,
-            "trigger_execution_id" => TriggerExecution::factory(),
-            "step_id" => Trigger::factory(),
-            "level" => LogLevel::Info,
-            "message" => $this->faker->sentence,
-            "details" => []
+            'id' => $this->faker->uuid,
+            'trigger_execution_id' => TriggerExecution::factory(),
+            'step_id' => Trigger::factory(),
+            'level' => LogLevel::Info,
+            'message' => $this->faker->sentence,
+            'details' => [],
         ];
     }
 }

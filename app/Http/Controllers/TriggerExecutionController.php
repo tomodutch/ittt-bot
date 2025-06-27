@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\TriggerExecutionData;
 use App\Models\TriggerExecution;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Data\TriggerExecutionData; // Your data transformer, adjust as needed
+use Inertia\Inertia; // Your data transformer, adjust as needed
 
 class TriggerExecutionController extends Controller
 {

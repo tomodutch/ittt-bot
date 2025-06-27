@@ -16,21 +16,21 @@ class TriggerOrchestrator
 {
     /**
      * Summary of process
-     * @param \Illuminate\Support\Collection<int, \App\Models\Schedule> $schedules
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\Schedule>  $schedules
      * @return void
      */
-
     public function process(Collection $schedules)
     {
-        $now = now("UTC");
+        $now = now('UTC');
 
-        Log::info("Start processing schedules", [
-            "schedulesCount" => $schedules->count()
+        Log::info('Start processing schedules', [
+            'schedulesCount' => $schedules->count(),
         ]);
 
-        $triggerGroups = $schedules->groupBy(fn(Schedule $schedule) => $schedule->trigger_id);
+        $triggerGroups = $schedules->groupBy(fn (Schedule $schedule) => $schedule->trigger_id);
 
-        Log::debug("Map grouped schedules into TriggerExecution data and keep schedules for pivot");
+        Log::debug('Map grouped schedules into TriggerExecution data and keep schedules for pivot');
         $triggerExecutionsData = $triggerGroups->map(function ($schedules, $triggerId) use ($now) {
             $model = new TriggerExecution([
                 'trigger_id' => $triggerId,
@@ -55,20 +55,21 @@ class TriggerOrchestrator
             ];
         });
 
-        Log::debug("Bulk insert TriggerExecutions (exclude _schedule_ids)");
-        $insertData = $triggerExecutionsData->map(fn($data) => collect($data)->except('_schedule_ids')->toArray());
+        Log::debug('Bulk insert TriggerExecutions (exclude _schedule_ids)');
+        $insertData = $triggerExecutionsData->map(fn ($data) => collect($data)->except('_schedule_ids')->toArray());
         TriggerExecution::insert($insertData->toArray());
 
-        Log::debug("Prepare pivot table data linking trigger_executions to schedules");
+        Log::debug('Prepare pivot table data linking trigger_executions to schedules');
         $pivotData = $triggerExecutionsData->flatMap(function ($data) {
             $triggerExecutionId = $data['id'];
-            return $data['_schedule_ids']->map(fn($scheduleId) => [
+
+            return $data['_schedule_ids']->map(fn ($scheduleId) => [
                 'trigger_execution_id' => $triggerExecutionId,
                 'schedule_id' => $scheduleId,
             ]);
         });
 
-        Log::debug("Insert into pivot table");
+        Log::debug('Insert into pivot table');
         DB::table('schedule_trigger_execution')->insert($pivotData->toArray());
 
         foreach ($triggerExecutionsData as $data) {

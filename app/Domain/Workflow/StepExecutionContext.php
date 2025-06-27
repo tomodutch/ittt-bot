@@ -7,9 +7,7 @@ use Illuminate\Support\Collection;
 
 final class StepExecutionContext
 {
-    public function __construct(private Collection $variables, private Collection $params = new Collection())
-    {
-    }
+    public function __construct(private Collection $variables, private Collection $params = new Collection) {}
 
     public function getVariable(string $key)
     {
@@ -39,6 +37,7 @@ final class StepExecutionContext
     public function merge(Collection $newVariables): self
     {
         $mergedArray = array_replace_recursive($this->variables->all(), $newVariables->all());
+
         return new self(collect($mergedArray), $this->params);
     }
 }

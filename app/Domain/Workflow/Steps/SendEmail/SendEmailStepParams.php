@@ -12,6 +12,5 @@ final class SendEmailStepParams extends StepDataParams
         public readonly ?string $bcc,
         public readonly string $subject,
         public readonly string $body
-    ) {
-    }
+    ) {}
 }

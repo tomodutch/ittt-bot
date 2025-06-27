@@ -10,8 +10,8 @@ final class SendEmailStepData extends StepData
 {
     #[LiteralTypeScriptType('"notify.email.send"')]
     public StepType $type = StepType::SendEmail;
+
     public function __construct(
         public readonly SendEmailStepParams $params
-    ) {
-    }
+    ) {}
 }

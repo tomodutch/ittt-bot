@@ -3,14 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Data\TriggerData;
-use App\Domain\Workflow\Steps\StepType;
 use App\Enums\ScheduleType;
 use App\Models\Trigger;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class TriggerController extends Controller
@@ -31,10 +28,11 @@ class TriggerController extends Controller
         }
 
         $triggerData = TriggerData::from($request->all());
+
         return DB::transaction(function () use ($triggerData, $request) {
             $trigger = Trigger::create([
                 'name' => $triggerData->name,
-                "user_id" => $request->user()->id,
+                'user_id' => $request->user()->id,
                 'description' => $triggerData->description,
                 'execution_type' => $triggerData->executionType,
             ]);
@@ -58,10 +56,10 @@ class TriggerController extends Controller
             foreach ($triggerData->steps as $step) {
                 $trigger->steps()->create([
                     'type' => $step->type,
-                    'name' => "test",
-                    "order" => $step->order,
+                    'name' => 'test',
+                    'order' => $step->order,
                     'description' => $step->description,
-                    "params" => $step->params
+                    'params' => $step->params,
                 ]);
             }
 
@@ -93,6 +91,7 @@ class TriggerController extends Controller
     public function destroy(Trigger $trigger)
     {
         $trigger->delete();
+
         return redirect()->route('triggers.index')->with('success', 'Trigger deleted.');
     }
 
@@ -109,8 +108,8 @@ class TriggerController extends Controller
     {
         $triggerData = TriggerData::from(
             $trigger->load('schedules')
-            ->load("executions")
-            ->load("steps"));
+                ->load('executions')
+                ->load('steps'));
 
         return inertia('triggers/show', [
             'trigger' => $triggerData,

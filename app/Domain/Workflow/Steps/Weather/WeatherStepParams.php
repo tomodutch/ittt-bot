@@ -9,10 +9,9 @@ class WeatherStepParams extends StepDataParams
 {
     public function __construct(
         public readonly string $location,
-    ) {
-    }
+    ) {}
 
-    public static function rules(ValidationContext $context = null): array
+    public static function rules(?ValidationContext $context = null): array
     {
         return [
             'location' => ['required', 'string', 'max:255'],

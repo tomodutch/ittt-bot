@@ -2,16 +2,16 @@
 
 namespace Tests\Feature\Workflow\Steps;
 
-use App\Domain\Workflow\Steps\SendEmail\SendEmailStepHandler;
 use App\Domain\Workflow\StepExecutionContext;
 use App\Domain\Workflow\StepResultBuilder;
+use App\Domain\Workflow\Steps\SendEmail\SendEmailStepHandler;
 use App\Mail\StepMailable;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class SendEmailStepTest extends TestCase
 {
-    public function testNoCc()
+    public function test_no_cc()
     {
         Mail::fake();
 
@@ -25,15 +25,16 @@ class SendEmailStepTest extends TestCase
 
         $context = new StepExecutionContext(collect(), $params);
 
-        $builder = new StepResultBuilder();
-        $handler = new SendEmailStepHandler();
+        $builder = new StepResultBuilder;
+        $handler = new SendEmailStepHandler;
         $handler->process($context, $builder);
 
         Mail::assertSent(StepMailable::class, function (StepMailable $mail) use ($params) {
             return $mail->hasTo($params['to']);
         });
     }
-    public function testSend()
+
+    public function test_send()
     {
         Mail::fake();
 
@@ -47,8 +48,8 @@ class SendEmailStepTest extends TestCase
 
         $context = new StepExecutionContext(collect(), $params);
 
-        $builder = new StepResultBuilder();
-        $handler = new SendEmailStepHandler();
+        $builder = new StepResultBuilder;
+        $handler = new SendEmailStepHandler;
         $handler->process($context, $builder);
 
         Mail::assertSent(StepMailable::class, function (StepMailable $mail) use ($params) {
@@ -56,7 +57,7 @@ class SendEmailStepTest extends TestCase
                 $mail->hasTo($params['to']) &&
                 $mail->hasCc($params['cc']) &&
                 $mail->hasBcc($params['bcc']) &&
-                $mail->hasSubject($params["subject"]);
+                $mail->hasSubject($params['subject']);
         });
     }
 }

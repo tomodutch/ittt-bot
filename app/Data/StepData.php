@@ -11,10 +11,16 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScriptType;
 class StepData extends Data
 {
     public ?string $id;
+
     public ?string $triggerId;
+
     public int $order;
+
     public string $description;
+
     public StepType $type;
+
     public ?CarbonImmutable $createdAt;
+
     public ?CarbonImmutable $updatedAt;
 }

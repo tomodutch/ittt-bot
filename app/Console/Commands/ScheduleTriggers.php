@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\RunTriggerExecution;
 use App\Services\DueScheduleFinder;
 use App\Services\TriggerOrchestrator;
 use Illuminate\Console\Command;
@@ -38,11 +37,12 @@ class ScheduleTriggers extends Command
 
         if ($dueSchedules->isEmpty()) {
             $this->info('No due schedules found.');
+
             return;
         }
 
         $this->info("Found {$dueSchedules->count()} due schedules.");
-        
+
         // Process the due schedules
         $this->info('Scheduling triggers...');
         $this->triggerOrchestrator->process($dueSchedules);

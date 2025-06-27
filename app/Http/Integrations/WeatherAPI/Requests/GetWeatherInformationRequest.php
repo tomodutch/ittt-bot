@@ -2,10 +2,10 @@
 
 namespace App\Http\Integrations\WeatherAPI\Requests;
 
+use App\Http\Integrations\WeatherAPI\DataTransferObjects\WeatherData;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use App\Http\Integrations\WeatherAPI\DataTransferObjects\WeatherData;
 
 class GetWeatherInformationRequest extends Request
 {
@@ -13,6 +13,7 @@ class GetWeatherInformationRequest extends Request
      * The HTTP method of the request
      */
     protected Method $method = Method::GET;
+
     public function __construct(private string $apiKey, private string $location) {}
 
     /**
@@ -27,12 +28,14 @@ class GetWeatherInformationRequest extends Request
     {
         return [
             'key' => $this->apiKey,
-            'q' => $this->location
+            'q' => $this->location,
         ];
     }
 
-    public function createDtoFromResponse(Response $response): mixed {
+    public function createDtoFromResponse(Response $response): mixed
+    {
         $body = $response->json();
+
         return WeatherData::fromArray($body);
     }
 }

@@ -2,7 +2,4 @@
 
 namespace App\Domain\Workflow\Directive;
 
-final class AbortDirective extends FlowDirective
-{
-
-}
+final class AbortDirective extends FlowDirective {}
