@@ -40,27 +40,43 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y unzip git zip curl \
  && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy entire app so artisan exists
 COPY . .
 
-# Run composer install
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
 # ----------------------
-# Stage 3: Final app image
+# Stage 3: Frontend build
+# ----------------------
+FROM node:18-alpine AS frontend-build
+
+WORKDIR /app
+
+COPY package*.json vite.config.js ./
+RUN npm ci
+
+COPY resources ./resources
+COPY public ./public
+
+RUN npm run build
+
+# ----------------------
+# Stage 4: Final app image
 # ----------------------
 FROM php-base AS final
 
 WORKDIR /var/www/html
 
-# Copy just the built vendor directory
+# Copy built PHP vendor
 COPY --from=composer /app/vendor ./vendor
 COPY --from=composer /app/composer.* ./
 
-# Then copy the actual app code
+# Copy app source code
 COPY . .
 
-# Set up app permissions
+# Copy frontend build assets from frontend-build stage
+COPY --from=frontend-build /app/public/build ./public/build
+
+# Set permissions
 RUN addgroup -g 1000 www \
  && adduser -u 1000 -G www -s /bin/sh -D www \
  && chown -R www:www /var/www/html \
@@ -71,12 +87,10 @@ RUN addgroup -g 1000 www \
 # Ensure PHP-FPM listens on all interfaces
 RUN sed -i 's|^listen = .*|listen = 0.0.0.0:9000|' /usr/local/etc/php-fpm.d/www.conf
 
-# Add supervisor and cron setup
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/laravel-cron /etc/periodic/1min/laravel-cron
 RUN chmod +x /etc/periodic/1min/laravel-cron
 
-# Switch to www user for running the app
 USER www
 
 EXPOSE 9000
