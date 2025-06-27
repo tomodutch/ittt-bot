@@ -64,7 +64,9 @@ COPY . .
 RUN addgroup -g 1000 www \
  && adduser -u 1000 -G www -s /bin/sh -D www \
  && chown -R www:www /var/www/html \
- && chmod -R 755 /var/www/html
+ && chmod -R 755 /var/www/html \
+ && chown -R www:www /var/www/html/storage /var/www/html/bootstrap/cache \
+ && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Ensure PHP-FPM listens on all interfaces
 RUN sed -i 's|^listen = .*|listen = 0.0.0.0:9000|' /usr/local/etc/php-fpm.d/www.conf
@@ -74,7 +76,8 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/laravel-cron /etc/periodic/1min/laravel-cron
 RUN chmod +x /etc/periodic/1min/laravel-cron
 
-USER root
+# Switch to www user for running the app
+USER www
 
 EXPOSE 9000
 
