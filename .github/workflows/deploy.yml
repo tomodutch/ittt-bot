@@ -108,7 +108,7 @@ jobs:
           LOG_LEVEL=info
 
           DB_CONNECTION=pgsql
-          DB_HOST=db
+          DB_HOST=${{ vars.DB_HOST }}
           DB_PORT=5432
           DB_DATABASE=${{ vars.DB_NAME }}
           DB_USERNAME=${{ vars.DB_USER }}
