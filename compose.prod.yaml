@@ -49,6 +49,24 @@ services:
       postgres:
         condition: service_healthy
 
+  scheduler:
+    image: ghcr.io/${REPO_OWNER}/ittt-bot-php-fpm:${IMAGE_TAG}
+    env_file:
+      - .env
+    volumes:
+      - ittt-bot-storage-production:/var/www/storage
+      - ittt-bot-public-assets:/var/www/public/build
+    networks:
+      - ittt-bot-production
+    depends_on:
+      - php-fpm
+    entrypoint: ["sh", "-c"]
+    command: >
+      while true; do
+        php /var/www/artisan schedule:run --verbose --no-interaction
+        sleep 60
+      done
+
   postgres:
     image: postgres:17.5
     restart: unless-stopped
