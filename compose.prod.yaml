@@ -62,10 +62,7 @@ services:
       - php-fpm
     entrypoint: ["sh", "-c"]
     command: >
-      while true; do
-        php artisan schedule:run --verbose --no-interaction
-        sleep 60
-      done
+      while true; do php /var/www/artisan schedule:run --verbose --no-interaction; sleep 60; done
 
   postgres:
     image: postgres:17.5
