@@ -75,6 +75,9 @@ RUN curl -o /usr/local/bin/php-fpm-healthcheck \
 COPY ./docker/production/php-fpm/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+COPY ./docker/production/php-fpm/scheduler.sh /usr/local/bin/scheduler.sh
+RUN chmod +x /usr/local/bin/scheduler.sh
+
 # Copy the initial storage structure
 COPY ./storage /var/www/storage-init
 

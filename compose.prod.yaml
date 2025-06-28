@@ -60,9 +60,7 @@ services:
       - ittt-bot-production
     depends_on:
       - php-fpm
-    entrypoint: ["sh", "-c"]
-    command: >
-      while true; do php /var/www/artisan schedule:run --verbose --no-interaction; sleep 60; done
+    entrypoint: ["/usr/local/bin/scheduler.sh"]
 
   postgres:
     image: postgres:17.5
