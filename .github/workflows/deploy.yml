@@ -190,8 +190,8 @@ jobs:
                 image: ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }}
               php-fpm:
                 image: ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }}
-            scheduler:
-              image: ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }}
+              scheduler:
+                image: ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }}
             EOF
       - name: Start containers using pulled image
         run: docker compose --env-file .env -f compose.prod.yaml -f docker-compose.override.yaml up -d --remove-orphans
