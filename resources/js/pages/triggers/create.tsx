@@ -1,71 +1,97 @@
-import React from 'react';
-import AppLayout from '@/layouts/app-layout';
+import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import { Head } from '@inertiajs/react';
 import TriggerBuilder from './step-builder';
-import { ScheduleBuilder } from './schedule-builder';
-import { type BreadcrumbItem, type Step, Schedule, Trigger } from '@/types';
+import { StepType, type BreadcrumbItem } from '@/types';
+import { useTriggerBuilder } from "./builder-hook";
+import { Accordion, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { AccordionContent } from '@radix-ui/react-accordion';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { router, usePage } from '@inertiajs/react';
+import stepConfig from "./step-config";
+import { StepData } from '@/types/generated';
+import { ConditionForm, FetchWeatherForm, SendEmailForm } from './step-components';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Triggers', href: '/triggers' },
 ];
 
-
 export default function CreateTriggerPage() {
-    const { errors } = usePage().props
-    const [steps, setSteps] = React.useState<Step[]>([]);
-    const [schedule, setSchedule] = React.useState<Schedule>({
-        id: null,
-        triggerId: "",
-        typeCode: 'Daily',
-        time: '10:00',
-        daysOfTheWeek: [],
-        oneTimeAt: '',
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        createdAt: null,
-        updatedAt: null,
-    });
-
-    function handleSave() {
-        const newTrigger: Trigger = {
-            id: null,
-            name: 'New Trigger',
-            description: 'This is a new trigger',
-            executionType: "Webhook",
-            schedules: [schedule],
-            executions: [],
-            steps: steps,
-            createdAt: null,
-            updatedAt: null,
-        }
-
-        router.post('/triggers', newTrigger);
-    };
+    const {
+        steps,
+        addStep,
+        connectSteps,
+        selectedStep,
+        setSelectedStep,
+        layoutVersion
+    } = useTriggerBuilder();
+    const [addStepType, setAddStepType] = useState<StepType>("http.weather.location");
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppHeaderLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Trigger" />
-            {JSON.stringify(errors)}
-            <div className="p-4 space-y-8 pb-24">
-                <div>
-                    <h1 className="text-2xl font-semibold mb-4">Create Trigger</h1>
-                    <ScheduleBuilder schedule={schedule} setSchedule={setSchedule} />
+            <div className="flex h-[calc(100vh-100px)]">
+                <div className="flex-grow h-full min-w-0">
+                    <div className="w-full h-full">
+                        <TriggerBuilder
+                            steps={steps}
+                            onConnect={connectSteps}
+                            setSelectedStep={setSelectedStep}
+                            layoutVersion={layoutVersion}
+                        />
+                    </div>
                 </div>
 
-                <div>
-                    <h2 className="text-xl font-semibold mb-4">Steps</h2>
-                    <TriggerBuilder steps={steps} setSteps={setSteps} />
-                </div>
-            </div>
+                <div className="w-[20vw] border-l border-gray-200 p-4 overflow-auto h-full">
+                    <Accordion type="single">
+                        <AccordionItem value="edit">
+                            <AccordionTrigger>Edit Step</AccordionTrigger>
+                            <AccordionContent>
+                                {renderStep(selectedStep)}
+                            </AccordionContent>
+                        </AccordionItem>
 
-            {/* Fixed Save Button at Bottom */}
-            <div className="fixed bottom-0 left-0 right-0 z-10 border-t bg-background shadow-md">
-                <div className="max-w-4xl mx-auto px-4 py-3 flex justify-end">
-                    <Button onClick={handleSave}>Save Trigger</Button>
+                        <AccordionItem value="add">
+                            <AccordionTrigger>Add New Step</AccordionTrigger>
+                            <AccordionContent>
+                                <Select value={addStepType} onValueChange={(selected: StepType) => {
+                                    setAddStepType(selected);
+                                }}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Theme" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Object.entries(stepConfig).map(([key, config]) => (
+                                            <SelectItem key={key} value={key}>
+                                                {config.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <Button onClick={() => {
+                                    addStep(addStepType);
+                                }}>Add</Button>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </div>
             </div>
-        </AppLayout>
+        </AppHeaderLayout>
     );
+}
+
+function renderStep(step: StepData | null) {
+    if (!step) return <p>Select a step to edit</p>
+    switch (step.type) {
+        case "http.weather.location":
+            return <FetchWeatherForm step={step} onChange={() => { }} />
+        case "logic.conditional.simple":
+            return <ConditionForm step={step} onChange={() => { }} />
+        case "notify.email.send":
+            return <SendEmailForm step={step} onChange={() => { }} />
+        case "logic.entry":
+            return <div>entry</div>
+    }
 }

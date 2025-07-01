@@ -1,3 +1,17 @@
+export type EntryStepData = {
+type: "logic.entry";
+params: EntryStepParams;
+id: string | null;
+key: string;
+triggerId: string | null;
+order: number;
+description: string;
+createdAt: string | null;
+updatedAt: string | null;
+};
+export type EntryStepParams = {
+nextStep: string;
+};
 export type ExecutionStatus = 'Idle' | 'Running' | 'Finished';
 export type ExecutionType = 'Schedule' | 'Webhook';
 export type LogLevel = 'Emergency' | 'Alert' | 'Critical' | 'Error' | 'Warning' | 'Notice' | 'Info' | 'Debug';
@@ -19,6 +33,7 @@ export type SendEmailStepData = {
 type: "notify.email.send";
 params: SendEmailStepParams;
 id: string | null;
+key: string;
 triggerId: string | null;
 order: number;
 description: string;
@@ -31,11 +46,13 @@ cc: string | null;
 bcc: string | null;
 subject: string;
 body: string;
+nextStep: string;
 };
 export type SimpleConditionalStepData = {
 type: "logic.conditional.simple";
 params: SimpleConditionalStepParams;
 id: string | null;
+key: string;
 triggerId: string | null;
 order: number;
 description: string;
@@ -46,8 +63,10 @@ export type SimpleConditionalStepParams = {
 left: string;
 operator: Operator;
 right: any;
+nextStepIfTrue: string;
+nextStepIfFalse: string;
 };
-export type StepData = SendEmailStepData | SimpleConditionalStepData | WeatherStepData;
+export type StepData = SendEmailStepData | SimpleConditionalStepData | WeatherStepData | EntryStepData;
 export type StepDataParams = {
 };
 export type StepExecutionLogData = {
@@ -58,7 +77,7 @@ level: LogLevel;
 message: string;
 details: Array<any> | null;
 };
-export type StepType = 'http.weather.location' | 'notify.email.send' | 'logic.conditional.simple';
+export type StepType = 'logic.entry' | 'http.weather.location' | 'notify.email.send' | 'logic.conditional.simple';
 export type TriggerData = {
 id: string | null;
 name: string;
@@ -87,6 +106,7 @@ export type WeatherStepData = {
 type: "http.weather.location";
 params: WeatherStepParams;
 id: string | null;
+key: string;
 triggerId: string | null;
 order: number;
 description: string;
@@ -95,4 +115,5 @@ updatedAt: string | null;
 };
 export type WeatherStepParams = {
 location: string;
+nextStep: string;
 };

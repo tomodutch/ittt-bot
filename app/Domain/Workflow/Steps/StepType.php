@@ -14,6 +14,7 @@ use App\Domain\Workflow\Steps\Weather\WeatherStepParams;
 
 enum StepType: string
 {
+    case Entry = "logic.entry";
     case FetchWeatherForLocation = 'http.weather.location';
     case SendEmail = 'notify.email.send';
     case SimpleConditional = 'logic.conditional.simple';
