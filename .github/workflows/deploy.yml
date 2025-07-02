@@ -32,7 +32,7 @@ jobs:
             --push \
             --tag ghcr.io/${{ github.repository_owner }}/ittt-bot-php-fpm:${{ github.sha }} \
             --target production \
-            --no-cache
+            --no-cache \
             -f docker/common/php-fpm/Dockerfile .
 
       - name: Build and Push Web (Nginx) Image
@@ -40,7 +40,7 @@ jobs:
           docker buildx build \
             --push \
             --tag ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }} \
-            --no-cache
+            --no-cache \
             -f docker/production/nginx/Dockerfile .
 
       - name: "Clean up old Docker images (Retention: keep latest 5)"
