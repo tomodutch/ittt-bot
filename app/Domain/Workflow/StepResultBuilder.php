@@ -2,7 +2,7 @@
 
 namespace App\Domain\Workflow;
 
-use App\Domain\Workflow\Directive\ContinueDirective;
+use App\Domain\Workflow\Directive\AbortDirective;
 use App\Domain\Workflow\Directive\FlowDirective;
 use App\Enums\LogLevel as AppLogLevel;
 use Illuminate\Support\Collection;
@@ -35,7 +35,7 @@ final class StepResultBuilder implements LoggerInterface
     {
         return new StepResult(
             variables: $this->variables,
-            directive: $this->directive ?? new ContinueDirective,
+            directive: $this->directive ?? new AbortDirective,
             logs: $this->logs
         );
     }

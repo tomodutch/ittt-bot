@@ -11,7 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::table('steps', function (Blueprint $table) {
+            $table->dropIndex(['trigger_id', 'order']);
+            $table->dropColumn('order');
+        });
     }
 
     /**
@@ -19,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('steps', function (Blueprint $table) {
+            $table->integer('order')->default(0);
+        });
     }
 };

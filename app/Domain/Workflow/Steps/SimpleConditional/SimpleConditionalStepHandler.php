@@ -3,7 +3,6 @@
 namespace App\Domain\Workflow\Steps\SimpleConditional;
 
 use App\Domain\Workflow\Contracts\StepHandlerContract;
-use App\Domain\Workflow\Directive\AbortDirective;
 use App\Domain\Workflow\Directive\ContinueDirective;
 use App\Domain\Workflow\StepExecutionContext;
 use App\Domain\Workflow\StepResultBuilder;
@@ -58,7 +57,7 @@ final class SimpleConditionalStepHandler implements StepHandlerContract
                 'right' => $rightValue,
             ]);
             $builder->info('Continuing workflow execution');
-            $builder->setDirective(new ContinueDirective);
+            $builder->setDirective(new ContinueDirective($context->getNextStepKey()));
         } else {
             $builder->info('Condition evaluated to false', [
                 'left' => $leftValue,
@@ -66,7 +65,7 @@ final class SimpleConditionalStepHandler implements StepHandlerContract
                 'right' => $rightValue,
             ]);
             $builder->info('Aborting workflow execution');
-            $builder->setDirective(new AbortDirective);
+            $builder->setDirective(new ContinueDirective($context->getNextStepKeyIfFalse()));
         }
     }
 }

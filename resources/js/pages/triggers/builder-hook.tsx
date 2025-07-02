@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { StepType, Trigger, Schedule } from "@/types";
 import { router } from "@inertiajs/react";
 import { StepData } from "@/types/generated";
+import { Connection } from "@xyflow/react";
 
 export function useTriggerBuilder() {
     const [steps, setSteps] = useState<StepData[]>([
@@ -9,10 +10,10 @@ export function useTriggerBuilder() {
             id: null,
             type: "logic.entry",
             key: "entry-1",
-            order: 1,
+            nextStepKey: null,
             triggerId: "",
             description: "",
-            params: { nextStep: "" },
+            params: {},
             createdAt: null,
             updatedAt: null,
         },
@@ -40,7 +41,6 @@ export function useTriggerBuilder() {
             const base: Partial<StepData> = {
                 id: null,
                 key,
-                order: prev.length,
                 triggerId: "",
                 description: "",
                 createdAt: null,
@@ -61,8 +61,6 @@ export function useTriggerBuilder() {
                                 left: "",
                                 operator: "==",
                                 right: "",
-                                nextStepIfTrue: "",
-                                nextStepIfFalse: "",
                             },
                         } as StepData;
                     default:
@@ -82,47 +80,16 @@ export function useTriggerBuilder() {
         );
     }, []);
 
-    const connectSteps = useCallback((sourceKey: string, targetKey: string) => {
+    const connectSteps = useCallback((connection: Connection) => {
+        const { source: sourceKey, target: targetKey } = connection;
         setSteps((prev) =>
             prev.map((s) => {
                 if (s.key !== sourceKey) return s;
-
-                switch (s.type) {
-                    case "logic.conditional.simple":
-                        return {
-                            ...s,
-                            params: {
-                                ...s.params,
-                                nextStepIfTrue: targetKey,
-                            },
-                        };
-                    case "http.weather.location":
-                        return {
-                            ...s,
-                            params: {
-                                ...s.params,
-                                nextStep: targetKey,
-                            },
-                        };
-                    case "notify.email.send":
-                        return {
-                            ...s,
-                            params: {
-                                ...s.params,
-                                nextStep: targetKey,
-                            },
-                        };
-                    case "logic.entry":
-                        return {
-                            ...s,
-                            params: {
-                                ...s.params,
-                                nextStep: targetKey,
-                            },
-                        };
-                    default:
-                        throw new Error("undefined type");
+                if (s.type === "logic.conditional.simple" && connection.sourceHandle !== "default") {
+                    return { ...s, nextStepKeyIfFalse: targetKey };
                 }
+
+                return { ...s, nextStepKey: targetKey };
             })
         );
         setLayoutVersion((v) => v + 1);
@@ -133,7 +100,7 @@ export function useTriggerBuilder() {
             id: null,
             name: "New Trigger",
             description: "This is a new trigger",
-            executionType: "Webhook",
+            executionType: "Schedule",
             schedules: [schedule],
             executions: [],
             steps: steps,

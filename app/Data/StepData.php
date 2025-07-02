@@ -11,13 +11,14 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScriptType;
 class StepData extends Data
 {
     public ?string $id;
-    public string $key;
+
+    public ?string $key;
 
     public ?string $triggerId;
 
-    public int $order;
+    public ?string $nextStepKey;
 
-    public string $description;
+    public ?string $description;
 
     public StepType $type;
 

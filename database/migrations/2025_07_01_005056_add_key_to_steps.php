@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -14,6 +15,8 @@ return new class extends Migration {
         Schema::table('steps', function (Blueprint $table) {
             // Add key as nullable first
             $table->string('key')->nullable()->after('id');
+            $table->string('nextStepKey')->nullable();
+            $table->string('nextStepKeyIfFalse')->nullable();
         });
 
         // Copy id to key
@@ -44,12 +47,15 @@ return new class extends Migration {
             }
 
             $table->dropColumn('key');
+            $table->dropColumn('nextStepKey');
+            $table->dropColumn('nextStepKeyIfFalse');
         });
     }
 
     private function isPostgres()
     {
         $connection = config('database.default');
+
         return $connection === 'pgsql';
     }
 };

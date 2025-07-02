@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Data\TriggerData;
+use App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepData;
 use App\Enums\ScheduleType;
 use App\Models\Trigger;
 use Carbon\Carbon;
@@ -54,13 +55,19 @@ class TriggerController extends Controller
             }
 
             foreach ($triggerData->steps as $step) {
-                $trigger->steps()->create([
+                $attributes = [
                     'type' => $step->type,
                     'name' => 'test',
-                    'order' => $step->order,
+                    'key' => $step->key,
+                    'nextStepKey' => $step->nextStepKey,
                     'description' => $step->description,
                     'params' => $step->params,
-                ]);
+                ];
+                if ($step instanceof SimpleConditionalStepData) {
+                    $attributes['nextStepKeyIfFalse'] = $step->nextStepKeyIfFalse;
+                }
+
+                $trigger->steps()->create($attributes);
             }
 
             return redirect()->route('triggers.show', $trigger->id)
@@ -109,7 +116,8 @@ class TriggerController extends Controller
         $triggerData = TriggerData::from(
             $trigger->load('schedules')
                 ->load('executions')
-                ->load('steps'));
+                ->load('steps')
+        );
 
         return inertia('triggers/show', [
             'trigger' => $triggerData,

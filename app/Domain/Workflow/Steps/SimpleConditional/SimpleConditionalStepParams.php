@@ -7,12 +7,9 @@ use App\Enums\Operator;
 
 final class SimpleConditionalStepParams extends StepDataParams
 {
-    public function __construct(
-        public readonly string $left,
-        public readonly Operator $operator,
-        public readonly mixed $right,
-        public readonly string $nextStepIfTrue,
-        public readonly string $nextStepIfFalse
-    ) {
-    }
+    public string $left;
+
+    public Operator $operator;
+
+    public mixed $right;
 }

@@ -9,16 +9,17 @@ class WorkflowFactory
     public static function createWeatherWorkflow()
     {
         return [
-            Step::factory()->fetchWeatherAction()->create(['order' => 0]),
+            Step::factory()->entry()->create(['nextStepKey' => 'weather']),
+            Step::factory()->fetchWeatherAction()->create(['nextStepKey' => 'conditional']),
             Step::factory()->conditional()->create([
-                'order' => 1,
+                'nextStepKey' => 'sendEmail',
                 'params' => [
                     'left' => 'weather.temperature',
                     'operator' => '>=',
                     'right' => 10,
                 ],
             ]),
-            Step::factory()->sendEmail()->create(['order' => 2]),
+            Step::factory()->sendEmail()->create([]),
         ];
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Domain\Workflow\Steps;
 
+use App\Domain\Workflow\Steps\Entry\EntryStepData;
+use App\Domain\Workflow\Steps\Entry\EntryStepHandler;
+use App\Domain\Workflow\Steps\Entry\EntryStepParams;
 use App\Domain\Workflow\Steps\SendEmail\SendEmailStepData;
 use App\Domain\Workflow\Steps\SendEmail\SendEmailStepHandler;
 use App\Domain\Workflow\Steps\SendEmail\SendEmailStepParams;
@@ -14,7 +17,7 @@ use App\Domain\Workflow\Steps\Weather\WeatherStepParams;
 
 enum StepType: string
 {
-    case Entry = "logic.entry";
+    case Entry = 'logic.entry';
     case FetchWeatherForLocation = 'http.weather.location';
     case SendEmail = 'notify.email.send';
     case SimpleConditional = 'logic.conditional.simple';
@@ -38,6 +41,11 @@ enum StepType: string
     private function getConfig(): StepConfig
     {
         return match ($this) {
+            self::Entry => new StepConfig(
+                EntryStepData::class,
+                EntryStepParams::class,
+                EntryStepHandler::class
+            ),
             self::FetchWeatherForLocation => new StepConfig(
                 WeatherStepData::class,
                 WeatherStepParams::class,

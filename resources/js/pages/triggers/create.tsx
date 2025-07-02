@@ -11,6 +11,9 @@ import stepConfig from "./step-config";
 import { StepData } from '@/types/generated';
 import { ConditionForm, FetchWeatherForm, SendEmailForm } from './step-components';
 import { useState } from 'react';
+import { AlertCircle, Save } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
+import ScheduleBuilder from './schedule-builder';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -24,9 +27,22 @@ export default function CreateTriggerPage() {
         connectSteps,
         selectedStep,
         setSelectedStep,
-        layoutVersion
+        layoutVersion,
+        handleSave,
+        setSteps,
+        schedule,
+        setSchedule
     } = useTriggerBuilder();
     const [addStepType, setAddStepType] = useState<StepType>("http.weather.location");
+    const page = usePage();
+    const { errors } = page.props;
+
+
+    const onStepChange = (updatedStep: StepData) => {
+        setSteps((prevSteps) =>
+            prevSteps.map((s) => (s.key === updatedStep.key ? updatedStep : s))
+        );
+    };
 
     return (
         <AppHeaderLayout breadcrumbs={breadcrumbs}>
@@ -45,10 +61,17 @@ export default function CreateTriggerPage() {
 
                 <div className="w-[20vw] border-l border-gray-200 p-4 overflow-auto h-full">
                     <Accordion type="single">
+                        <AccordionItem value="schedule">
+                            <AccordionTrigger>Schedule</AccordionTrigger>
+                            <AccordionContent>
+                                <ScheduleBuilder schedule={schedule} setSchedule={setSchedule} />
+                            </AccordionContent>
+                        </AccordionItem>
+
                         <AccordionItem value="edit">
                             <AccordionTrigger>Edit Step</AccordionTrigger>
                             <AccordionContent>
-                                {renderStep(selectedStep)}
+                                {renderStep(selectedStep, onStepChange)}
                             </AccordionContent>
                         </AccordionItem>
 
@@ -76,21 +99,54 @@ export default function CreateTriggerPage() {
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
+
+                    <div className="sticky bottom-0 bg-white border-t border-gray-200 pt-4 pb-4 mt-4">
+                        <Button
+                            variant="ghost"
+                            className="w-full text-primary hover:bg-primary/10"
+                            onClick={() => {
+                                handleSave();
+                            }}
+                        >
+                            <Save className="mr-2 h-4 w-4" />
+                            Save
+                        </Button>
+
+                        {Object.keys(errors).length > 0 && (
+                            <div className="mt-2 flex items-center space-x-2 text-red-600 text-sm">
+                                <AlertCircle className="h-4 w-4" />
+                                <div>
+                                    {Object.entries(errors).map(([field, messages]) => (
+                                        <p key={field}>{messages}</p>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </AppHeaderLayout>
     );
 }
 
-function renderStep(step: StepData | null) {
+function renderStep(step: StepData | null, onStepChange: (updatedStep: StepData) => void) {
     if (!step) return <p>Select a step to edit</p>
     switch (step.type) {
         case "http.weather.location":
-            return <FetchWeatherForm step={step} onChange={() => { }} />
+            return <FetchWeatherForm step={step} onChange={(newParams) => {
+                step.params = { ...step.params, ...newParams };
+                onStepChange(step);
+            }} />
         case "logic.conditional.simple":
-            return <ConditionForm step={step} onChange={() => { }} />
+            return <ConditionForm step={step} onChange={(newParams) => {
+                step.params = { ...step.params, ...newParams };
+                onStepChange(step);
+            }} />
         case "notify.email.send":
-            return <SendEmailForm step={step} onChange={() => { }} />
+            return <SendEmailForm step={step} onChange={(newParams) => {
+                step.params = { ...step.params, ...newParams };
+                onStepChange(step);
+            }} />
         case "logic.entry":
             return <div>entry</div>
     }

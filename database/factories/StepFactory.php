@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class StepFactory extends Factory
 {
     /**
-     * Define the model's default state.
+     * Define the model"s default state.
      *
      * @return array<string, mixed>
      */
@@ -22,9 +22,16 @@ class StepFactory extends Factory
             'id' => $this->faker->uuid(),
             'trigger_id' => Trigger::factory(),
             'description' => $this->faker->realTextBetween(10, 150),
-            'order' => $this->faker->numberBetween(0, 10),
             'params' => [],
         ];
+    }
+
+    public function entry()
+    {
+        return $this->state([
+            'type' => StepType::Entry,
+            'params' => [],
+        ]);
     }
 
     public function fetchWeatherAction()
@@ -43,7 +50,10 @@ class StepFactory extends Factory
             'type' => StepType::SendEmail,
             'params' => [
                 'to' => $this->faker->email(),
-                'message' => $this->faker->text(),
+                'cc' => $this->faker->email(),
+                'bcc' => $this->faker->email(),
+                'body' => $this->faker->text(),
+                'subject' => $this->faker->realTextBetween(1, 55),
             ],
         ]);
     }

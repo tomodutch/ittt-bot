@@ -7,6 +7,7 @@ import '@xyflow/react/dist/style.css';
 import { StepData } from '@/types/generated';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { MoreVertical, Trash2 } from 'lucide-react';
+import stepConfig from "./step-config";
 
 interface StepNodeParams {
     data: {
@@ -20,7 +21,7 @@ export default function StepNode({ data }: StepNodeParams) {
     let node;
     switch (data.step.type) {
         case "http.weather.location":
-            node = <>weather</>
+            node = <>Fetch weather for {data.step.params.location}</>
             break;
         case "notify.email.send":
             node = <>email</>
@@ -49,7 +50,7 @@ export default function StepNode({ data }: StepNodeParams) {
 
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium truncate">
-                    {data.step.description || data.step.type}
+                    {data.step.description || stepConfig[data.step.type]?.label || data.step.type}
                 </CardTitle>
                 <div className="flex gap-1">
                     <button className="text-destructive hover:opacity-80" onClick={() => console.log('remove')}>

@@ -11,7 +11,7 @@ final class SimpleConditionalStepData extends StepData
     #[LiteralTypeScriptType('"logic.conditional.simple"')]
     public StepType $type = StepType::SimpleConditional;
 
-    public function __construct(
-        public readonly SimpleConditionalStepParams $params,
-    ) {}
+    public SimpleConditionalStepParams $params;
+
+    public ?string $nextStepKeyIfFalse;
 }

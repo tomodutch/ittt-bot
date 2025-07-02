@@ -5,13 +5,12 @@ namespace App\Domain\Workflow;
 use App\Domain\Workflow\Contracts\StepProcessorContract;
 use App\Domain\Workflow\Directive\AbortDirective;
 use App\Domain\Workflow\Directive\ContinueDirective;
-use App\Domain\Workflow\Directive\GoToDirective;
-use App\Domain\Workflow\Directive\RetryDirective;
-use App\Domain\Workflow\Directive\SkipDirective;
+use App\Domain\Workflow\Steps\StepType;
 use App\Enums\ExecutionStatus;
 use App\Models\StepExecutionLog;
 use App\Models\TriggerExecution;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class TriggerExecutionProcessor
 {
@@ -22,13 +21,29 @@ class TriggerExecutionProcessor
         $triggerExecution->status_code = ExecutionStatus::Running;
         $triggerExecution->save();
 
+        $steps = $triggerExecution->trigger->steps()->get();
+        $entryStep = $steps->first(function ($step) {
+            return $step->type->value === StepType::Entry->value;
+        });
+
+        if (! $entryStep) {
+            Log::info("Abort trigger execution {$triggerExecution->id} because no entry step was found");
+            $triggerExecution->status_code = ExecutionStatus::Finished;
+            $triggerExecution->save();
+
+            return;
+        }
+
+        $stepsMap = $steps->keyBy(function ($step) {
+            return $step->key;
+        });
         $context = new StepExecutionContext(new Collection);
-        $steps = $triggerExecution->trigger->steps()->orderBy('order')->get();
+
+        $step = $entryStep;
         $currentIndex = 0;
         $doAbort = false;
         $maxLoops = 100;
-        while ($currentIndex < $maxLoops && ! $doAbort && isset($steps[$currentIndex])) {
-            $step = $steps[$currentIndex];
+        while ($step && $currentIndex < $maxLoops && ! $doAbort) {
             $result = $this->stepProcessor->process($step, $context);
             $logs = $result->getLogs();
 
@@ -45,27 +60,16 @@ class TriggerExecutionProcessor
             );
             $context = $context->merge($result->getVariables());
 
-            switch (get_class($result->getDirective())) {
-                case ContinueDirective::class:
-                    $currentIndex++;
-                    break;
-
-                case AbortDirective::class:
+            $directive = $result->getDirective();
+            if ($directive instanceof ContinueDirective) {
+                $nextStepKey = $directive->nextStepKey;
+                if ($nextStepKey && $nextStep = $stepsMap->get($nextStepKey)) {
+                    $step = $nextStep;
+                } else {
                     $doAbort = true;
-                    break;
-
-                case RetryDirective::class:
-                    break;
-
-                case SkipDirective::class:
-                    $currentIndex++;
-                    break;
-
-                case GoToDirective::class:
-                    break;
-
-                default:
-                    throw new \LogicException('Unknown flow directive');
+                }
+            } elseif ($directive instanceof AbortDirective) {
+                $doAbort = true;
             }
         }
 

@@ -19,7 +19,9 @@ class Step extends Model
         'trigger_id',
         'type',
         'description',
-        'order',
+        'key',
+        'nextStepKey',
+        'nextStepKeyIfFalse',
         'params',
     ];
 

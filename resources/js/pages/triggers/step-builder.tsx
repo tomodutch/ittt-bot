@@ -22,7 +22,7 @@ const nodeTypes = { stepNode: StepNode };
 
 interface Props {
     steps: StepData[];
-    onConnect: (source: string, target: string) => void;
+    onConnect: (connection: Connection) => void;
     setSelectedStep: (step: StepData) => void,
     layoutVersion: any
 }
@@ -51,11 +51,9 @@ export default function StepBuilder({
         setEdges(layoutedEdges);
     }, [steps, layoutVersion, setSelectedStep]);
 
-    const handleConnect = (params: Connection) => {
-        if (params.source && params.target) {
-            onConnect(params.source, params.target);
-            setEdges((eds) => addEdge(params, eds));
-        }
+    const handleConnect = (connection: Connection) => {
+        onConnect(connection);
+        setEdges((eds) => addEdge(connection, eds));
     };
 
     return (

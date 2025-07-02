@@ -7,16 +7,12 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class WeatherStepParams extends StepDataParams
 {
-    public function __construct(
-        public readonly string $location,
-        public readonly string $nextStep
-    ) {}
+    public string $location;
 
     public static function rules(?ValidationContext $context = null): array
     {
         return [
             'location' => ['required', 'string', 'max:255'],
-            "nextStep" => ["required", "string"]
         ];
     }
 }

@@ -2,224 +2,216 @@
 
 namespace Tests\Feature\Workflow\Steps;
 
-use App\Domain\Workflow\Directive\AbortDirective;
 use App\Domain\Workflow\Directive\ContinueDirective;
 use App\Domain\Workflow\StepExecutionContext;
 use App\Domain\Workflow\StepResultBuilder;
 use App\Domain\Workflow\Steps\SimpleConditional\SimpleConditionalStepHandler;
+use App\Domain\Workflow\Steps\StepExecutionMetadata;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class SimpleConditionalStepTest extends TestCase
 {
     #[DataProvider('conditionalCases')]
-    public function test_conditional_step(array $variables, array $params, string $expectedDirectiveClass)
+    public function test_conditional_step(array $variables, array $params, string $expectedNextStepKey)
     {
         $step = new SimpleConditionalStepHandler;
-        $context = new StepExecutionContext(collect($variables), collect($params));
+        $context = new StepExecutionContext(collect($variables));
+        $context = $context->withParams(collect($params))->WithMetadata(new StepExecutionMetadata('1', '2'));
         $builder = new StepResultBuilder;
 
         $step->process($context, $builder);
         $result = $builder->build();
 
-        $this->assertInstanceOf($expectedDirectiveClass, $result->getDirective());
+        $directive = $result->getDirective();
+        $this->assertInstanceOf(ContinueDirective::class, $directive);
+        if ($directive instanceof ContinueDirective) {
+            $this->assertEquals($expectedNextStepKey, $directive->nextStepKey);
+        }
     }
 
     public static function conditionalCases(): array
     {
         return [
-            // Equality and comparison
             'equal (true)' => [
                 ['value' => 5],
                 ['left' => 'value', 'operator' => '==', 'right' => 5],
-                ContinueDirective::class,
+                '1',
             ],
             'equal (false)' => [
                 ['value' => 5],
                 ['left' => 'value', 'operator' => '==', 'right' => 3],
-                AbortDirective::class,
+                '2',
             ],
             'not equal (true)' => [
                 ['value' => 5],
                 ['left' => 'value', 'operator' => '!=', 'right' => 3],
-                ContinueDirective::class,
+                '1',
             ],
             'not equal (false)' => [
                 ['value' => 5],
                 ['left' => 'value', 'operator' => '!=', 'right' => 5],
-                AbortDirective::class,
+                '2',
             ],
             'greater than (true)' => [
                 ['value' => 10],
                 ['left' => 'value', 'operator' => '>', 'right' => 5],
-                ContinueDirective::class,
+                '1',
             ],
             'greater than (false)' => [
                 ['value' => 4],
                 ['left' => 'value', 'operator' => '>', 'right' => 5],
-                AbortDirective::class,
+                '2',
             ],
             'greater than or equal (true)' => [
                 ['value' => 5],
                 ['left' => 'value', 'operator' => '>=', 'right' => 5],
-                ContinueDirective::class,
+                '1',
             ],
             'greater than or equal (false)' => [
                 ['value' => 4],
                 ['left' => 'value', 'operator' => '>=', 'right' => 5],
-                AbortDirective::class,
+                '2',
             ],
             'less than (true)' => [
                 ['value' => 3],
                 ['left' => 'value', 'operator' => '<', 'right' => 5],
-                ContinueDirective::class,
+                '1',
             ],
             'less than (false)' => [
                 ['value' => 6],
                 ['left' => 'value', 'operator' => '<', 'right' => 5],
-                AbortDirective::class,
+                '2',
             ],
             'less than or equal (true)' => [
                 ['value' => 5],
                 ['left' => 'value', 'operator' => '<=', 'right' => 5],
-                ContinueDirective::class,
+                '1',
             ],
             'less than or equal (false)' => [
                 ['value' => 6],
                 ['left' => 'value', 'operator' => '<=', 'right' => 5],
-                AbortDirective::class,
+                '2',
             ],
-
-            // Existence
             'exists (true)' => [
                 ['foo' => 'bar'],
                 ['left' => 'foo', 'operator' => 'exists'],
-                ContinueDirective::class,
+                '1',
             ],
             'exists (false)' => [
                 [],
                 ['left' => 'foo', 'operator' => 'exists'],
-                AbortDirective::class,
+                '2',
             ],
             'not exists (true)' => [
                 [],
                 ['left' => 'foo', 'operator' => 'not_exists'],
-                ContinueDirective::class,
+                '1',
             ],
             'not exists (false)' => [
                 ['foo' => 'bar'],
                 ['left' => 'foo', 'operator' => 'not_exists'],
-                AbortDirective::class,
+                '2',
             ],
-
-            // Null checks
             'null (true)' => [
                 ['foo' => null],
                 ['left' => 'foo', 'operator' => 'null'],
-                ContinueDirective::class,
+                '1',
             ],
             'null (false)' => [
                 ['foo' => 'value'],
                 ['left' => 'foo', 'operator' => 'null'],
-                AbortDirective::class,
+                '2',
             ],
             'not null (true)' => [
                 ['foo' => 'value'],
                 ['left' => 'foo', 'operator' => 'not_null'],
-                ContinueDirective::class,
+                '1',
             ],
             'not null (false)' => [
                 ['foo' => null],
                 ['left' => 'foo', 'operator' => 'not_null'],
-                AbortDirective::class,
+                '2',
             ],
-
-            // Empty checks
             'empty (true)' => [
                 ['foo' => ''],
                 ['left' => 'foo', 'operator' => 'empty'],
-                ContinueDirective::class,
+                '1',
             ],
             'empty (false)' => [
                 ['foo' => 'value'],
                 ['left' => 'foo', 'operator' => 'empty'],
-                AbortDirective::class,
+                '2',
             ],
             'not empty (true)' => [
                 ['foo' => 'value'],
                 ['left' => 'foo', 'operator' => 'not_empty'],
-                ContinueDirective::class,
+                '1',
             ],
             'not empty (false)' => [
                 ['foo' => ''],
                 ['left' => 'foo', 'operator' => 'not_empty'],
-                AbortDirective::class,
+                '2',
             ],
-
-            // String operators
             'contains (true)' => [
                 ['foo' => 'hello world'],
                 ['left' => 'foo', 'operator' => 'contains', 'right' => 'world'],
-                ContinueDirective::class,
+                '1',
             ],
             'contains (false)' => [
                 ['foo' => 'hello world'],
                 ['left' => 'foo', 'operator' => 'contains', 'right' => 'mars'],
-                AbortDirective::class,
+                '2',
             ],
             'starts_with (true)' => [
                 ['foo' => 'hello world'],
                 ['left' => 'foo', 'operator' => 'starts_with', 'right' => 'hello'],
-                ContinueDirective::class,
+                '1',
             ],
             'starts_with (false)' => [
                 ['foo' => 'hello world'],
                 ['left' => 'foo', 'operator' => 'starts_with', 'right' => 'world'],
-                AbortDirective::class,
+                '2',
             ],
             'ends_with (true)' => [
                 ['foo' => 'hello world'],
                 ['left' => 'foo', 'operator' => 'ends_with', 'right' => 'world'],
-                ContinueDirective::class,
+                '1',
             ],
             'ends_with (false)' => [
                 ['foo' => 'hello world'],
                 ['left' => 'foo', 'operator' => 'ends_with', 'right' => 'hello'],
-                AbortDirective::class,
+                '2',
             ],
-
-            // Regex match
             'matches (true)' => [
                 ['foo' => 'abc123'],
                 ['left' => 'foo', 'operator' => 'matches', 'right' => "/^[a-z]+\d+$/"],
-                ContinueDirective::class,
+                '1',
             ],
             'matches (false)' => [
                 ['foo' => '123abc'],
                 ['left' => 'foo', 'operator' => 'matches', 'right' => "/^[a-z]+\d+$/"],
-                AbortDirective::class,
+                '2',
             ],
-
-            // Array membership
             'in (true)' => [
                 ['foo' => 'apple'],
                 ['left' => 'foo', 'operator' => 'in', 'right' => ['apple', 'banana']],
-                ContinueDirective::class,
+                '1',
             ],
             'in (false)' => [
                 ['foo' => 'orange'],
                 ['left' => 'foo', 'operator' => 'in', 'right' => ['apple', 'banana']],
-                AbortDirective::class,
+                '2',
             ],
             'not_in (true)' => [
                 ['foo' => 'orange'],
                 ['left' => 'foo', 'operator' => 'not_in', 'right' => ['apple', 'banana']],
-                ContinueDirective::class,
+                '1',
             ],
             'not_in (false)' => [
                 ['foo' => 'apple'],
                 ['left' => 'foo', 'operator' => 'not_in', 'right' => ['apple', 'banana']],
-                AbortDirective::class,
+                '2',
             ],
         ];
     }

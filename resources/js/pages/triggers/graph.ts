@@ -22,7 +22,7 @@ export function getLayoutedElements(steps: Step[]) {
 
         dagreGraph.setEdge(source, target);
         edges.push({
-            id: `e-${source}-${target}`,
+            id: crypto.randomUUID(),
             source,
             target,
             type: "smoothstep",
@@ -40,21 +40,13 @@ export function getLayoutedElements(steps: Step[]) {
 
     // Register edges
     steps.forEach((step) => {
-        const { params, key, type } = step;
+        const { key, type } = step;
+        if (step.nextStepKey) {
+            pushEdge(key, step.nextStepKey);
+        }
 
-        if (params && typeof params === "object") {
-            if ("nextStep" in params && typeof params.nextStep === "string") {
-                pushEdge(key, params.nextStep);
-            }
-
-            if (type === "logic.conditional.simple") {
-                if ("nextStepIfTrue" in params && typeof params.nextStepIfTrue === "string") {
-                    pushEdge(key, params.nextStepIfTrue, "true");
-                }
-                if ("nextStepIfFalse" in params && typeof params.nextStepIfFalse === "string") {
-                    pushEdge(key, params.nextStepIfFalse, "false");
-                }
-            }
+        if (type === "logic.conditional.simple" && step.nextStepKeyIfFalse) {
+            pushEdge(key, step.nextStepKeyIfFalse, "false");
         }
     });
 

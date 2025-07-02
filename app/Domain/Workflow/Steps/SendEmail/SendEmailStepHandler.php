@@ -3,6 +3,7 @@
 namespace App\Domain\Workflow\Steps\SendEmail;
 
 use App\Domain\Workflow\Contracts\StepHandlerContract;
+use App\Domain\Workflow\Directive\ContinueDirective;
 use App\Domain\Workflow\StepExecutionContext;
 use App\Domain\Workflow\StepResultBuilder;
 use App\Mail\StepMailable;
@@ -39,5 +40,7 @@ final class SendEmailStepHandler implements StepHandlerContract
             'to' => $context->getParams()->get('to'),
             'subject' => $context->getParams()->get('subject'),
         ]);
+
+        $builder->setDirective(new ContinueDirective($context->getNextStepKey()));
     }
 }
