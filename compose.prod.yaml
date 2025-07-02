@@ -12,7 +12,7 @@ services:
       # The 'php-fpm' service mounts the same volume without ':ro' to allow write operations.
       # -----------------------------------------------------------
       - ittt-bot-storage-production:/var/www/storage:ro
-      - ittt-bot-public-assets:/var/www/public/build:ro
+      - ittt-bot-public-assets-${IMAGE_TAG}:/var/www/public/build:ro
     networks:
       - ittt-bot-production
     ports:
@@ -31,7 +31,7 @@ services:
     image: ghcr.io/${REPO_OWNER}/ittt-bot-php-fpm:${IMAGE_TAG}
     restart: unless-stopped
     volumes:
-      - ittt-bot-public-assets:/var/www/public/build  # Mount built public assets to ensure the manifest.json and hashed files match between Nginx and PHP-FPM
+      - ittt-bot-public-assets-${IMAGE_TAG}:/var/www/public/build  # Mount built public assets to ensure the manifest.json and hashed files match between Nginx and PHP-FPM
       - ittt-bot-storage-production:/var/www/storage  # Mount the storage volume
     env_file:
       - .env
@@ -55,7 +55,7 @@ services:
       - .env
     volumes:
       - ittt-bot-storage-production:/var/www/storage
-      - ittt-bot-public-assets:/var/www/public/build
+      - ittt-bot-public-assets-${IMAGE_TAG}:/var/www/public/build
     networks:
       - ittt-bot-production
     depends_on:
@@ -115,4 +115,3 @@ networks:
 volumes:
   ittt-bot-data-production:
   ittt-bot-storage-production:
-  ittt-bot-public-assets:
