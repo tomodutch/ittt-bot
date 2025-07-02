@@ -175,6 +175,8 @@ jobs:
       - name: create override file
         run : |
             cat <<EOF > docker-compose.override.yaml
+            volumes:
+              ittt-bot-public-assets-${{ github.sha }}:
             services:
               web:
                 image: ghcr.io/${{ github.repository_owner }}/ittt-bot-web:${{ github.sha }}
