@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card } from '@/components/ui/card';
 import { type SharedData, type Trigger, type Step, type Schedule } from '@/types';
+import ShowStepsGraph from './show-steps-graph';
 
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -74,27 +75,13 @@ function describeSchedule(schedule: Schedule) {
   }
 }
 
-function describeStep(step: Step) {
-  switch (step.type) {
-    case "http.weather.location":
-      return `Fetch weather for "${step.params.location}"`;
-    case 'logic.conditional.simple':
-      const c = step.params;
-      if (!c) return 'Condition (missing)';
-      return `If ${c.left} ${c.operator} ${c.right}`;
-    case 'notify.email.send':
-      return `Send email to "${step.params.to}" with subject "${step.params.subject}"`;
-    default:
-      return 'Unknown step';
-  }
-}
-
 interface PageProps {
   trigger: Trigger;
 }
 
 export default function ShowTrigger() {
   const { trigger } = usePage<SharedData & PageProps>().props;
+
 
   return (
     <AppLayout>
@@ -115,12 +102,7 @@ export default function ShowTrigger() {
 
         {trigger.steps && trigger.steps.length > 0 && (
           <Card className="p-4 space-y-2">
-            <h2 className="text-xl font-semibold">Steps</h2>
-            <ol className="list-decimal ml-6">
-              {trigger.steps.map((step, i) => (
-                <li key={i}>{describeStep(step)}</li>
-              ))}
-            </ol>
+            <ShowStepsGraph steps={trigger.steps} />
           </Card>
         )}
 

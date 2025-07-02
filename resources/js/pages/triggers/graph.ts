@@ -1,18 +1,25 @@
 import { Step } from "@/types";
 import { Edge, Node, Position } from "@xyflow/react";
 import dagre from "dagre";
+interface Params {
+    nodeWidth: number,
+    nodeHeight: number,
+}
 
-const nodeWidth = 250;
-const nodeHeight = 150;
+const defaults: Params = {
+    nodeWidth: 250,
+    nodeHeight: 150
+};
 
-export function getLayoutedElements(steps: Step[]) {
+export function getLayoutedElements(steps: Step[], params?: Params) {
+    params = params ?? defaults;
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
     dagreGraph.setGraph({ rankdir: "TB" }); // Top-to-bottom layout
 
     // Register nodes
     steps.forEach((step) => {
-        dagreGraph.setNode(step.key, { width: nodeWidth, height: nodeHeight });
+        dagreGraph.setNode(step.key, { width: params.nodeWidth, height: params.nodeHeight });
     });
 
     const edges: Edge[] = [];
@@ -61,8 +68,8 @@ export function getLayoutedElements(steps: Step[]) {
             id: step.key,
             type: "stepNode",
             position: {
-                x: dagreNode.x - nodeWidth / 2,
-                y: dagreNode.y - nodeHeight / 2,
+                x: dagreNode.x - params.nodeWidth / 2,
+                y: dagreNode.y - params.nodeHeight / 2,
             },
             data: { step },
         };
