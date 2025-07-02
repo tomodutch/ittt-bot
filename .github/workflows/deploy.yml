@@ -190,4 +190,4 @@ jobs:
         run: docker compose --env-file .env -f compose.prod.yaml -f docker-compose.override.yaml up -d --remove-orphans --force-recreate
 
       - name: Clean up unused Docker resources
-        run: docker system prune -af
+        run: docker system prune --volumes -af
