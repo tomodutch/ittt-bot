@@ -44,10 +44,10 @@ class TriggerController extends Controller
                 $trigger->schedules()->create([
                     'type_code' => $s->typeCode,
                     'one_time_at' => $s->typeCode === ScheduleType::Once && $s->oneTimeAt
-                        ? Carbon::parse($s->oneTimeAt, $timezone)->utc()
+                        ? Carbon::parse($s->oneTimeAt, $timezone)
                         : null,
                     'time' => $s->typeCode !== ScheduleType::Once && $s->time
-                        ? Carbon::parse($s->time, $timezone)->utc()->format('H:i')
+                        ? Carbon::parse($s->time, $timezone)->format('H:i')
                         : null,
                     'days_of_week' => $s->typeCode === ScheduleType::Weekly ? $s->daysOfWeek ?? [] : null,
                     'timezone' => $timezone,
